@@ -1,0 +1,76 @@
+#
+# Copyright 2020-2020 the original author or authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Server settings
+#-----------------------------------------------------------------------------------------------------------------------
+server:
+  fqdn: localhost
+  port: 8501
+  ssl:
+    # We do not have a real certificate
+    ignore-certificate-validation: true
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# JWT token
+#-----------------------------------------------------------------------------------------------------------------------
+jwt:
+  expiration: 1d
+  refresh-expiration: 1d
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Management endpoints
+#-----------------------------------------------------------------------------------------------------------------------
+management:
+  endpoint:
+    refresh.enabled: true
+    health:
+      group:
+        startup:
+          include: "ping, diskSpace, healthIndicatorDatabase"
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Admin settings
+#-----------------------------------------------------------------------------------------------------------------------
+admin:
+  keystore-admin-enabled: true
+  copyright: perit.hu
+  default-site-url: /app/browser
+  default-site-root-filename: index.html
+  admin-gui-url: /admin-gui
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Security settings
+#-----------------------------------------------------------------------------------------------------------------------
+security:
+  production-mode: false
+  swagger-access: "*"
+  management-endpoints-access: "*"
+  admin-gui-access: "*"
+  admin-endpoints-access: "*"
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Logging
+#-----------------------------------------------------------------------------------------------------------------------
+
+logging:
+  config: config/logback-local.xml

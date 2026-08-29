@@ -1,0 +1,28 @@
+meta {
+  name: authenticate admin
+  type: http
+  seq: 22
+}
+
+get {
+  url: {{url}}/api/spvitamin/authenticate
+  body: none
+  auth: basic
+}
+
+auth:basic {
+  username: perit\adadmin
+  password: adadmin
+}
+
+script:post-response {
+  test("Status code is 200", function () {
+      expect(res.getStatus()).to.equal(200);
+  });
+  var jsonData = res.getBody();
+  bru.setVar("token", jsonData.jwt);
+}
+
+settings {
+  encodeUrl: true
+}

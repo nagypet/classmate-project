@@ -1,0 +1,65 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0005_create_registration
+      author: classmate
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            schemaName: cmsa
+            tableName: registration
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: course_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: waitlist_position
+                  type: int
+              - column:
+                  name: registered_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+        - createIndex:
+            schemaName: cmsa
+            tableName: registration
+            indexName: ix_registration_01
+            unique: true
+            columns:
+              - column:
+                  name: course_id
+              - column:
+                  name: user_id
+        - addForeignKeyConstraint:
+            baseTableSchemaName: cmsa
+            baseTableName: registration
+            baseColumnNames: course_id
+            referencedTableSchemaName: cmsa
+            referencedTableName: course
+            referencedColumnNames: id
+            constraintName: fk_registration_course
+        - addForeignKeyConstraint:
+            baseTableSchemaName: cmsa
+            baseTableName: registration
+            baseColumnNames: user_id
+            referencedTableSchemaName: cmsa
+            referencedTableName: user
+            referencedColumnNames: id
+            constraintName: fk_registration_user

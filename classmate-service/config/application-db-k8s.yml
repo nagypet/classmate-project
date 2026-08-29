@@ -1,0 +1,14 @@
+#-----------------------------------------------------------------------------------------------------------------------
+# Datasource
+#-----------------------------------------------------------------------------------------------------------------------
+datasource:
+  classmate:
+    db-type: postgresql
+    host: 192.168.128.152
+    port: 30900
+    db-name: classmate
+    username: cmsa
+    # encrypted-password can be used as well.
+    password: cmsa
+    max-pool-size: 30
+    socket-timeout: 20000

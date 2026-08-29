@@ -1,0 +1,61 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0004_create_course
+      author: classmate
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            schemaName: cmsa
+            tableName: course
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: title
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: instructor_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: location
+                  type: varchar(255)
+              - column:
+                  name: scheduled_at
+                  type: timestamp
+              - column:
+                  name: capacity
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: varchar(150)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: varchar(150)
+              - column:
+                  name: updated_at
+                  type: timestamp
+        - addForeignKeyConstraint:
+            baseTableSchemaName: cmsa
+            baseTableName: course
+            baseColumnNames: instructor_id
+            referencedTableSchemaName: cmsa
+            referencedTableName: user
+            referencedColumnNames: id
+            constraintName: fk_course_instructor

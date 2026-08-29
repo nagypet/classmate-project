@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0003_create_userxrole
+      author: classmate
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            schemaName: cmsa
+            tableName: userxrole
+            columns:
+              - column:
+                  name: user_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            schemaName: cmsa
+            tableName: userxrole
+            columnNames: user_id, role_id
+            constraintName: pk_userxrole
+        - addForeignKeyConstraint:
+            baseTableSchemaName: cmsa
+            baseTableName: userxrole
+            baseColumnNames: user_id
+            referencedTableSchemaName: cmsa
+            referencedTableName: user
+            referencedColumnNames: id
+            constraintName: fk_userxrole_user
+        - addForeignKeyConstraint:
+            baseTableSchemaName: cmsa
+            baseTableName: userxrole
+            baseColumnNames: role_id
+            referencedTableSchemaName: cmsa
+            referencedTableName: role
+            referencedColumnNames: id
+            constraintName: fk_userxrole_role

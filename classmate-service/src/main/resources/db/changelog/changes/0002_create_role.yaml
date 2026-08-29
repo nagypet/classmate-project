@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0002_create_role
+      author: classmate
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            schemaName: cmsa
+            tableName: role
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(255)
+        - createIndex:
+            schemaName: cmsa
+            tableName: role
+            indexName: ix_role_01
+            unique: true
+            columns:
+              - column:
+                  name: name

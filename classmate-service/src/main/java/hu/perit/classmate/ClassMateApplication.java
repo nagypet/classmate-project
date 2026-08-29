@@ -21,6 +21,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Profile;
+import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * @author Peter Nagy
@@ -30,6 +33,9 @@ import org.springframework.context.annotation.Profile;
 @SpringBootApplication
 @ComponentScan(basePackages = {"hu.perit.spvitamin", "hu.perit.classmate"})
 @EnableFeignClients(basePackages = {"hu.perit.classmate"})
+@EnableScheduling
+@EnableAsync
+@EnableRetry
 public class ClassMateApplication
 {
     public static void main(String[] args)

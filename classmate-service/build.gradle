@@ -62,7 +62,7 @@ dependencies {
     implementation project(':spvitamin-spring-general')
     implementation project(':spvitamin-spring-logging')
     implementation project(':spvitamin-spring-security')
-    implementation project(':spvitamin-spring-security-ldap')
+    implementation project(':spvitamin-spring-security-oauth2')
     implementation project(':spvitamin-spring-server')
     implementation project(':spvitamin-spring-data')
     implementation project(':spvitamin-spring-cloud-feign')
@@ -83,6 +83,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    //implementation 'org.springframework.boot:spring-boot-h2console'
     implementation 'org.springframework.boot:spring-boot-starter-liquibase'
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
@@ -129,7 +130,7 @@ dependencies {
 
     //runtimeOnly libs.mssql.jdbc
     runtimeOnly 'org.postgresql:postgresql'
-    runtimeOnly 'com.h2database:h2'
+    //runtimeOnly 'com.h2database:h2'
 
 
     //------------------------------------------------------------------------------------------------------------------

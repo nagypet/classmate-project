@@ -1,0 +1,171 @@
+#
+# Copyright 2020-2022 the original author or authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Spring settings
+#-----------------------------------------------------------------------------------------------------------------------
+spring:
+  application:
+    name: classmate-service
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connect-timeout: 10000
+            read-timeout: 120000
+  jpa:
+    open-in-view: false
+  task:
+    scheduling:
+      pool.size: 10
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Feign retry
+#-----------------------------------------------------------------------------------------------------------------------
+spvitamin.feign:
+  retry:
+    period: 500
+    max-period: 2000
+    max-attempts: 3
+  logger-level: basic
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# System settings
+#-----------------------------------------------------------------------------------------------------------------------
+system.time-zone: Europe/Budapest
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Crypto settings
+#-----------------------------------------------------------------------------------------------------------------------
+crypto.secret: TWYT7uu0idwGgqmQTvhJ
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Server settings
+#-----------------------------------------------------------------------------------------------------------------------
+server:
+  fqdn: localhost
+  port: 8501
+  ssl:
+    enabled: true
+    key-store: classpath:jks/server-keystore.jks
+    key-store-password: changeit
+    key-alias: localhost
+    key-password: changeit
+
+    trust-store: classpath:jks/client-truststore.jks
+    trust-store-password: changeit
+
+  error:
+    includeException: true
+    includeStacktrace: NEVER
+    includeMessage: ALWAYS
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Security settings
+#-----------------------------------------------------------------------------------------------------------------------
+security:
+  additional-security-headers:
+    Content-Security-Policy: "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src * 'unsafe-inline'; img-src * data: blob:; font-src * data:; connect-src 'self'; object-src 'none'; frame-ancestors 'self'; base-uri 'self'; report-uri /api/spvitamin/admin/csp_violations;"
+    Permissions-Policy: "accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), display-capture=(), document-domain=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=()"
+  allowed-origins: "https://demo.microdms.com"
+  allowed-headers: "*"
+  allowed-methods: "OPTIONS, GET, POST, PUT, DELETE, PATCH"
+  swagger-access: ADMIN
+  management-endpoints-access: ADMIN
+  admin-gui-access: "*"
+  admin-endpoints-access: ADMIN
+  mode: authorization_server
+  auth:
+    client-id: 70ca3802-1783-4900-b548-fc3e5f8121bd
+    allow-token-in-response: false
+    access-token-cookie-name: classmate-at
+    refresh-token-cookie-name: classmate-rt
+  oauth2:
+    providers:
+      google:
+        display-name: Google
+        issuer-uri: https://accounts.google.com
+        client-id: 62961274523-fivf9rs9bcpgltp08s4blk1gpeteb381.apps.googleusercontent.com
+        client-secret-file: c:/np/Settings/cloud.google.classmate/client_secret.txt
+        scopes:
+          - openid
+          - profile
+          - email
+      facebook:
+        display-name: Facebook
+        client-id: 1023167934011362
+        client-secret-file: c:/np/Settings/facebook.classmate/app_secret.txt
+        scopes:
+          - public_profile
+          - email
+          - user_birthday
+          - user_gender
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# JWT token
+#-----------------------------------------------------------------------------------------------------------------------
+jwt:
+  private-key-alias: localhost
+  private-key-encryptedPassword: 0onLGCO+blRe2v9bo/q/PA==
+  public-key-alias: localhost
+  expiration: 5m
+  refresh-expiration: 30m
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Local users for test reasons
+#-----------------------------------------------------------------------------------------------------------------------
+# Please set either password or encrypted-password property
+localuser:
+  admin.encrypted-password: BDsCIw7btUc=
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# AD group -> role mapping (all = '*')
+#-----------------------------------------------------------------------------------------------------------------------
+roles:
+  # Operator
+  ROLE_ADMIN:
+    #groups: Admin
+    users: admin
+    #includes: ROLE_ADMIN
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Role -> permission mapping
+#-----------------------------------------------------------------------------------------------------------------------
+rolemap:
+  ROLE_ADMIN:
+    - IS_USERNAME_AVAILABLE
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Management endpoints
+#-----------------------------------------------------------------------------------------------------------------------
+management:
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+

@@ -1,0 +1,65 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0001_create_user
+      author: classmate
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            schemaName: cmsa
+            tableName: user
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: oauth_provider
+                  type: varchar(32)
+              - column:
+                  name: oauth_subject
+                  type: varchar(255)
+              - column:
+                  name: display_name
+                  type: varchar(255)
+              - column:
+                  name: email
+                  type: varchar(255)
+              - column:
+                  name: gender
+                  type: bigint
+              - column:
+                  name: birthdate
+                  type: date
+              - column:
+                  name: created_by
+                  type: varchar(150)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: varchar(150)
+              - column:
+                  name: updated_at
+                  type: timestamp
+        - addUniqueConstraint:
+            schemaName: cmsa
+            tableName: user
+            columnNames: email
+            constraintName: uq_user_email
+        - createIndex:
+            schemaName: cmsa
+            tableName: user
+            indexName: ix_user_01
+            unique: true
+            columns:
+              - column:
+                  name: oauth_provider
+              - column:
+                  name: oauth_subject

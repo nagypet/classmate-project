@@ -1,0 +1,18 @@
+#-----------------------------------------------------------------------------------------------------------------------
+# Datasource
+#-----------------------------------------------------------------------------------------------------------------------
+datasource:
+  classmate:
+    db-type: h2
+    host: mem
+    db-name: test
+    username: sa
+    password:
+    options: INIT=CREATE SCHEMA IF NOT EXISTS cmsa\;SET SCHEMA cmsa
+
+spring:
+  h2:
+    console:
+      enabled: true
+      path: /h2
+
