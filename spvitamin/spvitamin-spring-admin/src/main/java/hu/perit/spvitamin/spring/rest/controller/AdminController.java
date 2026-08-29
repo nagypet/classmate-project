@@ -1,0 +1,110 @@
+/*
+ * Copyright 2020-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package hu.perit.spvitamin.spring.rest.controller;
+
+import hu.perit.spvitamin.spring.admin.ShutdownManager;
+import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameter;
+import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterProvider;
+import hu.perit.spvitamin.spring.config.AdminProperties;
+import hu.perit.spvitamin.spring.manifest.ManifestReader;
+import hu.perit.spvitamin.spring.rest.api.AdminApi;
+import hu.perit.spvitamin.spring.rest.model.ServerSettingsResponse;
+import hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.env.Environment;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+/**
+ * @author Peter Nagy
+ */
+
+@RestController
+@Slf4j
+@RequiredArgsConstructor
+public class AdminController implements AdminApi
+{
+    private static final String MODULE_NAME = "admin-controller";
+
+    private final ShutdownManager sm;
+    private final ServerParameterProvider serverParameterProvider;
+    private final AdminProperties adminProperties;
+    private final Environment environment;
+
+
+    @Override
+    @LoggedRestMethod(eventId = 1, module = MODULE_NAME)
+    public ServerSettingsResponse retrieveServerSettingsUsingGET()
+    {
+        Map<String, Set<ServerParameter>> serverParameters = this.serverParameterProvider.getServerParameters();
+        ServerSettingsResponse serverSettingsResponse = new ServerSettingsResponse();
+        serverSettingsResponse.setServerParameters(serverParameters);
+        return serverSettingsResponse;
+    }
+
+
+    @Override
+    @LoggedRestMethod(eventId = 2, module = MODULE_NAME)
+    public Properties retrieveVersionInfoUsingGET()
+    {
+        String applicationName = environment.getProperty("spring.application.name");
+        Properties manifest = ManifestReader.getManifestAttributes(applicationName);
+        String name = manifest.getProperty("Implementation-Title", "Application Title");
+        String version = manifest.getProperty("Implementation-Version", "");
+        //String svnVersion = manifest.getProperty("SVN-REVISION", "");
+        String buildTime = manifest.getProperty("Build-Time", "");
+        String build;
+        if (StringUtils.isNoneBlank(buildTime))
+        {
+            build = String.format("%s", buildTime);
+        }
+        else
+        {
+            build = "Started from IDE, no build info is available!";
+        }
+
+        Properties props = new Properties();
+        props.setProperty("Title", name);
+        props.setProperty("Version", version);
+        props.setProperty("Build", build);
+        props.setProperty("Copyright", this.adminProperties.getCopyright());
+        props.setProperty("KeystoreAdminEnabled", this.adminProperties.getKeystoreAdminEnabled());
+
+        return props;
+    }
+
+
+    @Override
+    @LoggedRestMethod(eventId = 3, module = MODULE_NAME)
+    public void shutdown()
+    {
+        this.sm.start();
+    }
+
+
+    @Override
+    @LoggedRestMethod(eventId = 4, module = MODULE_NAME)
+    public void cspViolationsUsingPOST(String request)
+    {
+        log.warn("cspViolationsUsingPOST: {}", request);
+    }
+}

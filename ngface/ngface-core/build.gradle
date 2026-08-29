@@ -1,0 +1,192 @@
+/*
+ * Copyright 2020-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+plugins {
+    alias libs.plugins.org.springframework.boot
+    alias libs.plugins.io.spring.dependency.management
+    id 'java-library'
+    id 'jacoco'
+    id 'maven-publish'
+    id 'signing'
+    alias libs.plugins.habarta.typescript.generator
+}
+apply from: '../gradle/common.gradle'
+
+// Spring Boot 4.1.0 manages junit at 6.0.3, but 6.0.3 has a bug with KotlinReflectionUtils.
+// Override to use 6.1.0 where this is fixed.
+ext['junit-jupiter.version'] = libs.versions.junit.get()
+
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+
+dependencies {
+    implementation libs.jetbrains.annotations
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // Compile dependencies
+    // -----------------------------------------------------------------------------------------------------------------
+    if (Boolean.valueOf(project.findProperty('useSpvitaminProject') ?: 'false')) {
+        implementation project(':spvitamin-core')
+    } else {
+        implementation platform(libs.spvitamin)
+        implementation 'hu.perit.spvitamin:spvitamin-core'
+    }
+
+    // Lombok
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+
+    // apache.commons
+    implementation libs.commons.lang3
+    implementation libs.commons.collections4
+
+    // jsoup (HTML sanitization)
+    implementation libs.jsoup
+
+    // Validation
+    implementation libs.jakarta.annotation.api
+    implementation libs.jakarta.validation.api
+    implementation libs.hibernate.validator
+    implementation libs.glassfish.expressly
+
+    // FasterXML
+    implementation libs.jackson.annotations
+    implementation libs.jackson3.core
+    implementation libs.jackson3.databind
+
+    // Mapstruct
+    implementation libs.mapstruct
+    annotationProcessor libs.mapstruct.processor
+
+    // Slf4J
+    implementation libs.slf4j.api
+
+    // Google findbugs
+    implementation libs.google.code.findbugs
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // Test dependencies
+    // -----------------------------------------------------------------------------------------------------------------
+    // Lombok
+    testCompileOnly libs.lombok
+    testAnnotationProcessor libs.lombok
+
+    // spvitamin
+    if (Boolean.valueOf(project.findProperty('useSpvitaminProject') ?: 'false')) {
+        testImplementation project(':spvitamin-json-time')
+    } else {
+        testImplementation 'hu.perit.spvitamin:spvitamin-json-time'
+    }
+
+    // JUnit
+    testRuntimeOnly libs.junit.platform.launcher
+    testImplementation libs.junit.jupiter.api
+    testImplementation libs.junit.jupiter.engine
+
+    // AssertJ
+    testImplementation libs.assertj
+
+    testImplementation libs.logback.classic
+    testImplementation libs.logback.core
+}
+
+
+test {
+    useJUnitPlatform()
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// IMPORTANT: after the generation please manually change this lines
+// export interface WidgetData
+// {
+//     type: string; <= here
+// }
+//
+// export interface Widget<WD, SUB>
+// {
+//     type: string; <= and here
+//     ...
+// }
+//----------------------------------------------------------------------------------------------------------------------
+
+import cz.habarta.typescript.generator.*
+
+generateTypeScript {
+    jsonLibrary = JsonLibrary.jackson3
+    classPatterns = [
+            'hu.perit.ngface.core.widget.input.**',
+            'hu.perit.ngface.core.widget.form.**',
+            'hu.perit.ngface.core.widget.button.**',
+            'hu.perit.ngface.core.widget.table.**',
+            'hu.perit.ngface.core.widget.formattedtext.**',
+            'hu.perit.ngface.core.widget.titlebar.**',
+            'hu.perit.ngface.core.widget.collection.**',
+            'hu.perit.ngface.core.types.intf.*'
+    ]
+    customTypeNaming = [
+            'hu.perit.ngface.core.widget.input.TextInput$Data:TextInput.Data',
+            'hu.perit.ngface.core.widget.input.NumericInput$Data:NumericInput.Data',
+            'hu.perit.ngface.core.widget.input.DateInput$Data:DateInput.Data',
+            'hu.perit.ngface.core.widget.input.DateTimeInput$Data:DateTimeInput.Data',
+            'hu.perit.ngface.core.widget.input.DateRangeInput$Data:DateRangeInput.Data',
+            'hu.perit.ngface.core.widget.input.Select$Data:Select.Data',
+            'hu.perit.ngface.core.widget.input.Select$Option:Select.Option',
+            'hu.perit.ngface.core.widget.input.Autocomplete$Data:Autocomplete.Data',
+            'hu.perit.ngface.core.widget.input.Autocomplete$Data$ExtendedReadOnlyData:Autocomplete.Data.ExtendedReadOnlyData',
+            'hu.perit.ngface.core.widget.input.GenericAutocomplete$Data:GenericAutocomplete.Data',
+            'hu.perit.ngface.core.widget.input.GenericAutocomplete$Data$ExtendedReadOnlyData:GenericAutocomplete.Data.ExtendedReadOnlyData',
+            'hu.perit.ngface.core.widget.input.GenericValueSet$Item:GenericValueSet.Item',
+            'hu.perit.ngface.core.widget.formattedtext.FormattedText$Data:FormattedText.Data',
+            'hu.perit.ngface.core.widget.table.Table$SelectMode:Table.SelectMode',
+            'hu.perit.ngface.core.widget.table.Table$Data:Table.Data',
+            'hu.perit.ngface.core.widget.table.Column$Size:Column.Size',
+            'hu.perit.ngface.core.widget.table.Column$TextAlign:Column.TextAlign',
+            'hu.perit.ngface.core.widget.table.ColumnGroup$TextAlign:ColumnGroup.TextAlign',
+            'hu.perit.ngface.core.widget.table.ValueSet$Item:ValueSet.Item',
+            'hu.perit.ngface.core.widget.table.Action$Style:Action.Style',
+            'hu.perit.ngface.core.widget.table.cell.Cell$Icon$Placement:Icon.Placement',
+            'hu.perit.ngface.core.widget.collection.WidgetList$Data:WidgetList.Data',
+            'hu.perit.ngface.core.types.intf.DataRetrievalParams$Page:DataRetrievalParams.Page',
+            'hu.perit.ngface.core.types.intf.DataRetrievalParams$Sort:DataRetrievalParams.Sort',
+            'hu.perit.ngface.core.types.intf.DataRetrievalParams$Filter:DataRetrievalParams.Filter',
+            'hu.perit.ngface.core.types.intf.DataRetrievalParams$Filter$Item:DataRetrievalParams.Filter.Item',
+            'hu.perit.ngface.core.types.intf.RowSelectParams$SelectMode:RowSelectParams.SelectMode',
+            'hu.perit.ngface.core.types.intf.RowSelectParams$Row:RowSelectParams.Row',
+            'hu.perit.ngface.core.types.intf.Menu$Item:Menu.Item',
+            'hu.perit.ngface.core.widget.button.Button$Style:Button.Style',
+            'hu.perit.ngface.core.widget.button.Button$Option:Button.Option'
+    ]
+    outputFile = 'build/ngface-models.ts'
+    outputFileType = TypeScriptFileType.implementationFile
+    outputKind = TypeScriptOutputKind.module
+    namespace = 'Ngface'
+    optionalProperties = OptionalProperties.useSpecifiedAnnotations
+    optionalAnnotations = [
+            'javax.annotation.Nullable',
+            'jakarta.annotation.Nullable'
+    ]
+    optionalPropertiesDeclaration = OptionalPropertiesDeclaration.nullableType
+    disableTaggedUnions = true
+}
+
+dist.configure {
+    finalizedBy 'generateTypeScript'
+}

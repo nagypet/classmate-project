@@ -1,0 +1,79 @@
+/*
+ * Copyright 2020-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package hu.perit.spvitamin.core.timeoutlatch;
+
+/**
+ * A latch implementation with automatic timeout-based reopening.
+ * 
+ * <p>This class implements a latch that can be manually closed but will automatically
+ * reopen after a specified timeout period (hysteresis). This behavior is useful for
+ * implementing temporary blocking mechanisms like circuit breakers, rate limiters,
+ * or cooldown periods.</p>
+ * 
+ * <p>Features:</p>
+ * <ul>
+ *   <li>Configurable hysteresis timeout period</li>
+ *   <li>Thread-safe operation with synchronized methods</li>
+ *   <li>Automatic reopening after the timeout period</li>
+ *   <li>Simple open/closed state checking</li>
+ * </ul>
+ * 
+ * <p>The latch starts in an open state and can be closed with {@link #setClosed()}.
+ * Once closed, it will automatically reopen after the specified hysteresis period
+ * has elapsed.</p>
+ */
+public class TimeoutLatch
+{
+    private final Long hysteresisMillis;
+
+    private boolean opened;
+    private long timeClosing;
+
+    public TimeoutLatch(Long hysteresisMillis)
+    {
+        this.hysteresisMillis = hysteresisMillis;
+        this.opened = true;
+    }
+
+
+    public synchronized void setClosed()
+    {
+        this.opened = false;
+        this.timeClosing = System.currentTimeMillis();
+    }
+
+    public synchronized boolean isOpen()
+    {
+        if (this.opened)
+        {
+            return true;
+        }
+
+        if ((System.currentTimeMillis() - this.timeClosing) > hysteresisMillis)
+        {
+            this.opened = true;
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean isClosed()
+    {
+        return !isOpen();
+    }
+}

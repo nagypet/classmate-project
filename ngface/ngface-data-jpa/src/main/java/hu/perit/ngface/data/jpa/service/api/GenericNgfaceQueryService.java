@@ -1,0 +1,85 @@
+/*
+ * Copyright 2020-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package hu.perit.ngface.data.jpa.service.api;
+
+import hu.perit.ngface.core.types.intf.DataRetrievalParams;
+import hu.perit.ngface.core.types.table.SelectionStore;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+public interface GenericNgfaceQueryService<E, ID extends Serializable>
+{
+    /**
+     *
+     * @param dataRetrievalParams
+     * @return
+     */
+    Page<E> find(DataRetrievalParams dataRetrievalParams);
+
+    List<String> getDistinctValues(String fieldName, String searchText, Class<E> entityClass, List<DataRetrievalParams.Filter> activeFilters);
+
+    <T> List<String> getDistinctValues(String fieldName, String searchText, Class<E> entityClass, List<DataRetrievalParams.Filter> activeFilters, Class<T> fieldType);
+
+    <T> List<String> getMinMaxValues(String fieldName, String searchText, Class<E> entityClass, List<DataRetrievalParams.Filter> activeFilters, Class<T> fieldType);
+
+    Optional<E> findById(ID id);
+
+    List<E> findAllByIds(String idFieldName, List<ID> ids, List<DataRetrievalParams.Filter> activeFilters);
+
+    Page<E> findAllBySelection(String idFieldName, SelectionStore<?, ID> selectionStore, List<DataRetrievalParams.Filter> activeFilters, Pageable pageable);
+
+    List<E> findByActiveFilters(List<DataRetrievalParams.Filter> activeFilters);
+
+    /**
+     * Runs an aggregation (COUNT, SUM, AVG) on the given field with optional filters.
+     * SUM and AVG require a numeric field type; COUNT works on any type.
+     *
+     * @param aggregationType the type of aggregation to perform
+     * @param fieldName       the entity field to aggregate
+     * @param entityClass     the entity class
+     * @param filters         optional filters to apply as WHERE conditions
+     * @param fieldType       the Java type of the field (used for type validation)
+     * @return the aggregation result as BigDecimal
+     * @throws IllegalArgumentException if SUM or AVG is used on a non-numeric field type
+     */
+    <T> BigDecimal aggregate(AggregationType aggregationType, String fieldName, Class<E> entityClass,
+                             List<DataRetrievalParams.Filter> filters, Class<T> fieldType);
+
+    /**
+     * Runs an aggregation grouped by a field. Returns a map where keys are the distinct values
+     * of {@code groupByField} (as String) and values are the aggregation results.
+     * SUM and AVG require a numeric field type; COUNT works on any type.
+     *
+     * @param aggregationType the type of aggregation to perform
+     * @param fieldName       the entity field to aggregate
+     * @param entityClass     the entity class
+     * @param filters         optional filters to apply as WHERE conditions
+     * @param fieldType       the Java type of the field (used for type validation)
+     * @param groupByField    the entity field to group by
+     * @return map of groupBy field value → aggregation result
+     * @throws IllegalArgumentException if SUM or AVG is used on a non-numeric field type
+     */
+    <T> Map<String, BigDecimal> aggregate(AggregationType aggregationType, String fieldName, Class<E> entityClass,
+                                          List<DataRetrievalParams.Filter> filters, Class<T> fieldType,
+                                          String groupByField);
+}

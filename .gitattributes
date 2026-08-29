@@ -1,0 +1,20 @@
+# Default: keep LF under these folders (useful for scripts/configs)
+/k8s-test/**   text eol=lf
+/azure/**   text eol=lf
+
+# But never treat common binaries as text (prevents EOL conversion warnings & false diffs)
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.ico  binary
+*.pdf  binary
+*.zip  binary
+*.gz   binary
+*.jar  binary
+*.woff  binary
+*.woff2 binary
+
+# (Optional) be explicit for scripts if you prefer narrowing later
+*.sh text eol=lf

@@ -1,0 +1,107 @@
+/*
+ * Copyright 2020-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+plugins {
+    alias libs.plugins.org.springframework.boot
+    alias libs.plugins.io.spring.dependency.management
+    id 'java-library'
+    id 'jacoco'
+    id 'maven-publish'
+    id 'signing'
+    alias libs.plugins.habarta.typescript.generator
+}
+apply from: '../gradle/common.gradle'
+
+repositories {
+    mavenCentral()
+}
+
+
+// it will be a library, no fat jar
+bootJar {
+    enabled = false
+}
+
+
+dependencies {
+    // -----------------------------------------------------------------------------------------------------------------
+    // Compile dependencies
+    // -----------------------------------------------------------------------------------------------------------------
+    implementation project(':spvitamin-core')
+    implementation project(':spvitamin-spring-general')
+    implementation project(':spvitamin-spring-logging')
+
+    // Lombok
+    compileOnly libs.lombok
+    testCompileOnly libs.lombok
+    annotationProcessor libs.lombok
+    testAnnotationProcessor libs.lombok
+
+    // apache.commons
+    implementation libs.commons.lang3
+    implementation libs.commons.collections4
+    implementation libs.commons.io
+
+    // Spring
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // Guava
+    implementation libs.guava
+
+    // Swagger
+    implementation libs.openapi.ui
+    implementation libs.openapi.api
+
+    // Jackson
+    implementation libs.jackson3.core
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // Test dependencies
+    // -----------------------------------------------------------------------------------------------------------------
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly libs.junit.platform.launcher
+}
+
+
+test {
+    useJUnitPlatform()
+}
+
+
+import cz.habarta.typescript.generator.JsonLibrary
+import cz.habarta.typescript.generator.OptionalProperties
+import cz.habarta.typescript.generator.OptionalPropertiesDeclaration
+import cz.habarta.typescript.generator.TypeScriptFileType
+import cz.habarta.typescript.generator.TypeScriptOutputKind
+
+generateTypeScript {
+    jsonLibrary = JsonLibrary.jackson3
+    classPatterns = [
+            'hu.perit.spvitamin.spring.rest.model.**'
+    ]
+    outputFile = 'build/spvitamin-admin-models.ts'
+    outputFileType = TypeScriptFileType.implementationFile
+    outputKind = TypeScriptOutputKind.module
+    namespace = 'SpvitaminAdmin'
+    //disableTaggedUnions = true
+    optionalProperties = OptionalProperties.useSpecifiedAnnotations
+    optionalAnnotations = [
+            'javax.annotation.Nullable',
+            'jakarta.annotation.Nullable'
+    ]
+    optionalPropertiesDeclaration = OptionalPropertiesDeclaration.nullableType
+}

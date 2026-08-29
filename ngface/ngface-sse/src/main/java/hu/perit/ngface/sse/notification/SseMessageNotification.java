@@ -1,0 +1,102 @@
+/*
+ * Copyright 2020-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package hu.perit.ngface.sse.notification;
+
+import hu.perit.spvitamin.core.exception.ExceptionWrapper;
+import jakarta.annotation.Nullable;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
+
+import java.text.MessageFormat;
+import java.util.Optional;
+
+@Setter
+@Getter
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class SseMessageNotification extends SseNotification
+{
+    public static final String TXT_ERROR = "ERROR";
+
+
+    public enum Level
+    {
+        INFO,
+        WARNING,
+        ERROR
+    }
+
+
+    private final Level level;
+    @Nullable
+    private final String message;
+    @Nullable
+    private final String details;
+    @Nullable
+    private final String errorText;
+
+
+    public static SseMessageNotification create(String client, String subject, Level level, String message, String details)
+    {
+        return new SseMessageNotification(client, subject, level, message, details, null);
+    }
+
+
+    public static SseMessageNotification create(String client, String subject, Throwable throwable)
+    {
+        if (StringUtils.isBlank(subject))
+        {
+            throw new IllegalStateException(MessageFormat.format("The subject is mandatory for {0}", SseMessageNotification.class.getName()));
+        }
+
+        if (throwable == null)
+        {
+            return create(client, subject, Level.ERROR, TXT_ERROR, null);
+        }
+
+        ExceptionWrapper exception = ExceptionWrapper.of(throwable);
+        String message = Optional.ofNullable(exception.getRootCause())
+                .map(t -> StringUtils.isNotBlank(t.getMessage()) ? t.getMessage() : t.toString())
+                .orElse(TXT_ERROR);
+        String details = throwable.getMessage();
+        return create(client, subject, Level.ERROR, StringUtils.abbreviate(message, 50), StringUtils.abbreviate(message.equalsIgnoreCase(details) ? null : details, 200));
+    }
+
+
+    public SseMessageNotification(String client, String subject, Level level, @Nullable String message, @Nullable String details, @Nullable String errorText)
+    {
+        super(Type.MESSAGE, client, subject);
+        this.level = level;
+        this.message = message;
+        this.details = details;
+        this.errorText = errorText;
+    }
+
+
+    // Json
+    private SseMessageNotification()
+    {
+        super(Type.MESSAGE, null, "something");
+        this.level = Level.INFO;
+        this.message = null;
+        this.details = null;
+        this.errorText = null;
+    }
+}

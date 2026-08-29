@@ -1,0 +1,601 @@
+/*
+ * Copyright 2020-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import groovy.text.SimpleTemplateEngine
+
+group = 'hu.perit.classhub'
+
+
+tasks.withType(Copy).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    eachFile { println it.file }
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// defaultTasks
+//----------------------------------------------------------------------------------------------------------------------
+defaultTasks 'dist'
+
+
+if (!project.tasks.findByName('dist')) {
+    tasks.register('dist') {
+        group = 'fmake'
+    }
+}
+
+
+tasks.named('dist') {
+    if (project.hasProperty('test')) {
+        dependsOn 'test'
+    }
+
+    if (project.hasProperty('installBootDist')) {
+        dependsOn 'installBootDist'
+    } else if (project.hasProperty('shadowJar')) {
+        dependsOn 'shadowJar'
+        dependsOn 'installDist'
+    } else if (project.hasProperty('installDist')) {
+        dependsOn 'installDist'
+    } else if (project.hasProperty('jar')) {
+        dependsOn 'jar'
+    }
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// installDist
+//----------------------------------------------------------------------------------------------------------------------
+if (project.hasProperty('installDist')) {
+    tasks.named('installDist') {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        finalizedBy 'finalizeInstallDist'
+    }
+
+    tasks.register('finalizeInstallDist', Copy) {
+        group = 'fmake'
+        into "${buildDir}/install/${project.name}"
+        // This will be copied by the distribution plugin
+        /*
+        into (".") {
+            from "src/main/dist"
+        }
+        */
+        into("bin/config") {
+            from "config"
+        }
+    }
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// installBootDist
+//----------------------------------------------------------------------------------------------------------------------
+if (project.hasProperty('installBootDist')) {
+    tasks.named('installBootDist') {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        finalizedBy 'finalizeInstallBootDist'
+    }
+    tasks.register('finalizeInstallBootDist', Copy) {
+        group = 'fmake'
+        into "${buildDir}/install/${project.name}-boot"
+        into(".") {
+            from "src/main/dist"
+        }
+        into("bin/config") {
+            from "config"
+        }
+        into("bin") {
+            from "../deployment/${project.name}"
+        }
+    }
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// bootJar
+//----------------------------------------------------------------------------------------------------------------------
+if (project.hasProperty('bootJar')) {
+    tasks.named('bootJar') {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// BuildTime
+//----------------------------------------------------------------------------------------------------------------------
+if (project.hasProperty('compileJava')) {
+    task createBuildTimeTxt() {
+        outputs.file("${buildDir}/buildtime.txt")
+        doLast {
+            new File(buildDir, "buildtime.txt").text = """Buildtime: ${new Date().format('yyyy-MM-dd HH:mm:ss')}"""
+        }
+    }
+    compileJava.finalizedBy createBuildTimeTxt
+
+    compileJava {
+        options.encoding = "UTF-8"
+    }
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// JDK > 1.8
+//----------------------------------------------------------------------------------------------------------------------
+pluginManager.withPlugin('java') {
+    project.java {
+        sourceCompatibility = jvmVersion
+    }
+    println "sourceCompatibility for ${project.name}: ${jvmVersion}"
+    if (jvmVersion != '1.8') {
+        compileJava {
+            options.compilerArgs << '--add-exports'
+            options.compilerArgs << 'java.base/sun.security.ssl=ALL-UNNAMED'
+        }
+    }
+}
+
+
+task distWindowsService {
+    group = 'fmake'
+
+    if (project.hasProperty('test')) {
+        dependsOn 'test'
+    }
+
+    if (project.hasProperty('installBootDist')) {
+        dependsOn 'installBootDist'
+        dependsOn 'finalizeInstallBootDist'
+        dependsOn 'updateServiceXml'
+        //installBootDist.finalizedBy finalizeInstallBootDist
+    }
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Layered bootJar
+//----------------------------------------------------------------------------------------------------------------------
+if (project.hasProperty('bootJar')) {
+    bootJar {
+        layered {
+            enabled = true
+        }
+    }
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Version information
+//----------------------------------------------------------------------------------------------------------------------
+// Helper to bump patch in a version.ver file (no longer called automatically)
+def bumpPatchInVersionFile = { File vf ->
+    try {
+        if (vf != null && vf.exists()) {
+            def original = vf.text.trim()
+
+            // Split possible suffix (e.g., -SNAPSHOT)
+            def core = original
+            def suffix = ''
+            int dashIdx = original.indexOf('-')
+            if (dashIdx > 0) {
+                core = original.substring(0, dashIdx)
+                suffix = original.substring(dashIdx)
+            }
+
+            // Tokenize by dots and increment the last numeric part
+            def parts = core.tokenize('.')
+            if (parts.isEmpty()) {
+                parts = ['0', '0', '0']
+            }
+            def last = parts.last()
+            int lastNum = (last ==~ /\d+/) ? last.toInteger() : 0
+            parts[parts.size() - 1] = String.valueOf(lastNum + 1)
+
+            def bumped = parts.join('.') + suffix
+
+            // Write back only if changed
+            if (!bumped.equals(original)) {
+                vf.text = bumped + System.lineSeparator()
+                println "[common.gradle] ${project.name}: version.ver patch bumped ${original} -> ${bumped}"
+            }
+
+            return bumped
+        }
+    } catch (Exception e) {
+        println "[common.gradle] ${project.name}: Failed to bump version.ver: ${e.message}"
+    }
+    return null
+}
+
+// Locate version.ver (current project, or parent folder as fallback)
+def versionFile = new File("${projectDir}/version.ver")
+if (!versionFile.exists()) {
+    def alt = new File("${projectDir}/../version.ver")
+    if (alt.exists()) {
+        versionFile = alt
+    }
+}
+
+// Set project version from file without automatic bumping
+if (versionFile.exists()) {
+    version = versionFile.text.trim()
+} else {
+    println "version.ver not found while processing ${project.name}!"
+    version = 'dev'
+    //throw new RuntimeException("version.ver not found while processing ${project.name}!")
+}
+
+// Task to bump version.ver on demand
+tasks.register('bumpVersion') {
+    group = 'fmake'
+    description 'Bumps the patch number in version.ver (if present). Not executed automatically.'
+    doLast {
+        def vf = versionFile
+        if (vf != null && vf.exists()) {
+            def newVer = bumpPatchInVersionFile(vf)
+            if (newVer != null) {
+                // Also reflect it in the current build if tasks read version at execution time
+                project.version = newVer
+                println "[common.gradle] ${project.name}: project.version set to ${project.version} after bump"
+            } else {
+                println "[common.gradle] ${project.name}: No changes made to version.ver"
+            }
+        } else {
+            println "[common.gradle] ${project.name}: version.ver not found, cannot bump"
+        }
+    }
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Test support
+//----------------------------------------------------------------------------------------------------------------------
+task prepareTest(type: Copy) {
+    group = 'fmake'
+    from "src/main/dist/bin"
+    into "${projectDir}/build/resources/test"
+}
+
+if (project.hasProperty('test')) {
+    test {
+        dependsOn 'prepareTest'
+    }
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Integration test support
+//----------------------------------------------------------------------------------------------------------------------
+if (project.hasProperty('sourceSets')) {
+    sourceSets {
+        integtest {
+            java {
+                compileClasspath += main.output + test.output
+                runtimeClasspath += main.output + test.output
+                srcDir file('src/integtest/java')
+            }
+            resources.srcDir file('src/integtest/resources')
+        }
+    }
+}
+
+configurations {
+    integtestCompile.extendsFrom testCompile
+    integtestRuntime.extendsFrom runtime
+    integtestRuntimeOnly.extendsFrom runtimeOnly
+    integtestImplementation.extendsFrom testImplementation
+}
+
+task prepareIntegTest(type: Copy) {
+    group = 'fmake'
+
+    from "src/main/dist/bin"
+    into "${projectDir}/build/resources/integtest"
+}
+
+task prepareIntegTestInEclipse(type: Copy) {
+    group = 'fmake'
+
+    from "src/main/dist/bin"
+    into "${projectDir}/bin/integtest"
+}
+
+task integtest(type: Test) {
+    dependsOn 'prepareIntegTest'
+    if (project.hasProperty('sourceSets')) {
+        testClassesDirs = sourceSets.integtest.output.classesDirs
+        classpath = sourceSets.integtest.runtimeClasspath
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+tasks.named('integtest') {
+    useJUnitPlatform()
+}
+
+if (project.hasProperty('processIntegtestResources')) {
+    processIntegtestResources {
+        duplicatesStrategy = 'include'
+    }
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// MANIFEST
+//----------------------------------------------------------------------------------------------------------------------
+if (project.hasProperty('jar')) {
+    tasks.named('jar') {
+        dependsOn 'createBuildTimeTxt'
+        enabled = true
+        doFirst {
+            manifest {
+                attributes(
+                        'Implementation-Vendor': project.group,
+                        'Build-Time': new File("${buildDir}/buildtime.txt").text.replace('Buildtime: ', '').trim(),
+                        'Implementation-Version': project.version
+                )
+                if (project.hasProperty('application') && project.application.mainClass.isPresent()) {
+                    attributes(
+                            'Implementation-Title': project.name,
+                            'Implementation-Type': 'Application'
+                    )
+                }
+            }
+        }
+    }
+}
+
+if (project.hasProperty('bootJar')) {
+    tasks.named('bootJar') {
+        dependsOn 'createBuildTimeTxt'
+        doFirst {
+            manifest {
+                attributes(
+                        'Implementation-Vendor': project.group,
+                        'Build-Time': new File("${buildDir}/buildtime.txt").text.replace('Buildtime: ', '').trim(),
+                        'Implementation-Version': version
+                )
+                if (project.hasProperty('application') && project.application.mainClass.isPresent()) {
+                    attributes(
+                            'Implementation-Title': project.name,
+                            'Implementation-Type': 'Application'
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// updateServiceXml
+//----------------------------------------------------------------------------------------------------------------------
+if (project.tasks.findByName('installBootDist')) {
+    tasks.register('updateServiceXml') {
+        group = 'fmake'
+        description = 'Update service xml'
+
+        dependsOn 'installBootDist'
+
+        def serviceFile = new File("${buildDir}/install/${project.name}-boot/bin/${project.name}.xml")
+        def serviceFileName = serviceFile.toString()
+
+        doFirst {
+            if (serviceFile.exists()) {
+                println("> Updating ${serviceFileName} with jarname: ${project.name}-${version}.jar")
+
+                def binding = [
+                        JARNAME_PLACEHOLDER: "${project.name}-${version}.jar"
+                ]
+
+                def engine = new SimpleTemplateEngine()
+                def template = engine.createTemplate(serviceFile.text).make(binding)
+
+                serviceFile.write template.toString()
+            } else {
+                println("> ${serviceFileName} not found!")
+            }
+        }
+
+        outputs.upToDateWhen {
+            // Ha nem létezik, akkor up-to-date a task
+            !(new File(serviceFileName).exists())
+        }
+    }
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Application
+//----------------------------------------------------------------------------------------------------------------------
+if (project.hasProperty('application') && project.application.mainClass.isPresent()) {
+    application {
+        if (applicationDefaultJvmArgs.isEmpty()) {
+            applicationDefaultJvmArgs = ['-XX:+UseG1GC']
+        }
+    }
+}
+
+
+task configurations() {
+    group = 'fmake'
+    description = 'Prints the configuration items'
+    doLast {
+        configurations.each { println it.name }
+    }
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Start scripts
+//----------------------------------------------------------------------------------------------------------------------
+if (project.hasProperty('startScripts')) {
+    startScripts {
+        doLast {
+            windowsScript.text = windowsScript.text.replaceAll('set CLASSPATH=.*', 'set CLASSPATH=%APP_HOME%\\\\lib\\\\*')
+            unixScript.text = unixScript.text.replaceAll('CLASSPATH=.*', 'CLASSPATH=\\$APP_HOME/lib/*')
+        }
+    }
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// IntelliJ IDEA
+//----------------------------------------------------------------------------------------------------------------------
+tasks.register('prepareRunInIDEA', Copy) {
+    group = 'fmake'
+    into "${projectDir}/out/production/resources"
+    from "src/main/dist/bin"
+    from "config"
+    from "../deployment/${project.name}"
+}
+
+tasks.register('prepareRunInIDEA2021', Copy) {
+    group = 'fmake'
+    into "${projectDir}/build/resources/main"
+    from "src/main/dist/bin"
+    from "config"
+    from "../deployment/${project.name}"
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Eclipse
+//----------------------------------------------------------------------------------------------------------------------
+tasks.register('prepareRunInEclipse', Copy) {
+    group = 'fmake'
+    into "${projectDir}/bin/main"
+    from "src/main/dist/bin"
+    from "config"
+    from "../deployment/${project.name}"
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// RUN
+//----------------------------------------------------------------------------------------------------------------------
+tasks.register('prepareRun', Copy) {
+    group = 'fmake'
+    into "${projectDir}/build"
+    into("bin") {
+        from "src/main/dist/bin"
+    }
+    into("bin/config") {
+        from "config"
+    }
+    into("bin") {
+        from "../deployment/${project.name}"
+    }
+}
+
+if (project.hasProperty('run')) {
+    run {
+        dependsOn prepareRun
+//        doFirst {
+//            applicationDefaultJvmArgs += ['-Dspring.profiles.active=default,dev']
+//        }
+        workingDir = "${projectDir}/build/bin"
+    }
+}
+
+if (project.hasProperty('bootRun')) {
+    bootRun {
+        dependsOn prepareRun
+//        doFirst {
+//            applicationDefaultJvmArgs += ['-Dspring.profiles.active=default,dev']
+//        }
+        workingDir = "${projectDir}/build/bin"
+    }
+}
+
+
+if (project.hasProperty('jacocoTestReport')) {
+    jacocoTestReport {
+        dependsOn test
+        reports {
+            xml.required = true
+        }
+    }
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Publishing with source and javadoc
+//----------------------------------------------------------------------------------------------------------------------
+if (project.hasProperty('java')) {
+    java {
+        withSourcesJar()
+    }
+    java {
+        withJavadocJar()
+    }
+    tasks.withType(Javadoc) {
+        failOnError = false
+        options.addStringOption('Xdoclint:none', '-quiet')
+        options.addStringOption('encoding', 'UTF-8')
+        options.addStringOption('charSet', 'UTF-8')
+    }
+}
+
+
+pluginManager.withPlugin('maven-publish') {
+    publishing {
+        repositories {
+            maven {
+                name = "InnodoxMavenRepository"
+                url = "https://nexus.idx.com/repository/idx-maven-central/"
+                credentials {
+                    username = "idx"
+                    password = "idx"
+                }
+            }
+        }
+        publications {
+            mavenJava(MavenPublication) {
+                groupId = "${project.group}"
+                artifactId = "${project.name}"
+                version = "${version}"
+                from components.java
+                pom {
+                    name = "${project.group}:${project.name}"
+                    description = 'mebil project'
+                    developers {
+                        developer {
+                            id = 'nagypet'
+                            name = 'Peter Nagy'
+                            email = 'peter.nagy@perit.hu'
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    pluginManager.withPlugin('signing') {
+        signing {
+            sign publishing.publications.mavenJava
+        }
+    }
+}
+
+
+tasks.named("jar") {
+    archiveClassifier = ''
+}
