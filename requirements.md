@@ -133,3 +133,17 @@ courses ||--o{ registrations : "tartalmaz"
   bejegyzés automatikusan CONFIRMED státuszt kap (és `waitlist_position` NULL-ra áll).
 - **Oktató áttekintő:** a `courses` táblán `instructor_id = ?` szűréssel, a hozzájuk tartozó `registrations`
   aggregálásával állítható össze.
+
+## Authentikáció és regisztráció
+
+- A Google/Facebook OAuth2 bejelentkezés sikeres → CustomOAuth2SuccessHandler visszairányít a frontendre
+- A frontend meghívja a /api/spvitamin/authenticate endpointot → JWT tokent kap
+- Backend: a token generálás előtt (vagy utána) ellenőrzi, hogy a user létezik-e a DB-ben
+- Ha nem létezik akkor a token `userId` mezője nem tartalmaz adatot.
+- A frontend regisztrációs űrlapot mutat, bekéri a hiányzó adatokat. A szükséges adatok a következők:
+  - displayName
+  - email
+  - gender
+  - birthDate
+- A felhasználó menti az adatokat → mentés a user táblába
+- Ezután a tényleges alkalmazásba kerül

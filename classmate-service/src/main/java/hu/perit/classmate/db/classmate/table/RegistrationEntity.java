@@ -58,7 +58,7 @@ public class RegistrationEntity
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = COL_USER_ID, nullable = false)
-    private UserEntity user;
+    private UserAccountEntity user;
 
     @NotNull
     @Column(name = COL_STATUS, nullable = false)

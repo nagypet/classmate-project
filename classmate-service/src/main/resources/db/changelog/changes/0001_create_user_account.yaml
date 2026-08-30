@@ -1,12 +1,12 @@
 databaseChangeLog:
   - changeSet:
-      id: 0001_create_user
+      id: 0001_create_user_account
       author: classmate
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - createTable:
             schemaName: cmsa
-            tableName: user
+            tableName: user_account
             columns:
               - column:
                   name: id
@@ -15,23 +15,35 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: oauth_provider
+                  name: auth_provider
                   type: varchar(32)
+                  constraints:
+                    nullable: false
               - column:
-                  name: oauth_subject
+                  name: user_name
                   type: varchar(255)
+                  constraints:
+                    nullable: false
               - column:
                   name: display_name
                   type: varchar(255)
+                  constraints:
+                    nullable: false
               - column:
                   name: email
                   type: varchar(255)
+                  constraints:
+                    nullable: false
               - column:
                   name: gender
                   type: bigint
+                  constraints:
+                    nullable: false
               - column:
                   name: birthdate
                   type: date
+                  constraints:
+                    nullable: false
               - column:
                   name: created_by
                   type: varchar(150)
@@ -50,16 +62,16 @@ databaseChangeLog:
                   type: timestamp
         - addUniqueConstraint:
             schemaName: cmsa
-            tableName: user
+            tableName: user_account
             columnNames: email
             constraintName: uq_user_email
         - createIndex:
             schemaName: cmsa
-            tableName: user
-            indexName: ix_user_01
+            tableName: user_account
+            indexName: ix_user_account_01
             unique: true
             columns:
               - column:
-                  name: oauth_provider
+                  name: auth_provider
               - column:
-                  name: oauth_subject
+                  name: user_name

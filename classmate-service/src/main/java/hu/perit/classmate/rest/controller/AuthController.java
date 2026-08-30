@@ -16,6 +16,7 @@
 
 package hu.perit.classmate.rest.controller;
 
+import hu.perit.classmate.service.api.UserAccountService;
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.rest.api.AuthApi;
 import hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod;
@@ -39,6 +40,7 @@ public class AuthController implements AuthApi
 {
     private final JwtTokenProvider tokenProvider;
     private final AuthorizationService authorizationService;
+    private final UserAccountService userAccountService;
 
 
     @Override
@@ -50,6 +52,6 @@ public class AuthController implements AuthApi
         {
             log.info("{} logged in", authenticatedUser.getUsername());
         }
-        return tokenProvider.generateToken(authenticatedUser);
+        return tokenProvider.generateToken(this.userAccountService.findUserAccount(authenticatedUser));
     }
 }

@@ -1,12 +1,12 @@
 databaseChangeLog:
   - changeSet:
-      id: 0003_create_userxrole
+      id: 0003_create_useraccount_x_role
       author: classmate
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - createTable:
             schemaName: cmsa
-            tableName: userxrole
+            tableName: useraccount_x_role
             columns:
               - column:
                   name: user_id
@@ -20,22 +20,24 @@ databaseChangeLog:
                     nullable: false
         - addPrimaryKey:
             schemaName: cmsa
-            tableName: userxrole
+            tableName: useraccount_x_role
             columnNames: user_id, role_id
-            constraintName: pk_userxrole
+            constraintName: ix_useraccount_x_role_01
         - addForeignKeyConstraint:
             baseTableSchemaName: cmsa
-            baseTableName: userxrole
+            baseTableName: useraccount_x_role
             baseColumnNames: user_id
             referencedTableSchemaName: cmsa
-            referencedTableName: user
+            referencedTableName: user_account
             referencedColumnNames: id
-            constraintName: fk_userxrole_user
+            constraintName: fk_useraccount_x_role_user
+            onDelete: CASCADE
         - addForeignKeyConstraint:
             baseTableSchemaName: cmsa
-            baseTableName: userxrole
+            baseTableName: useraccount_x_role
             baseColumnNames: role_id
             referencedTableSchemaName: cmsa
             referencedTableName: role
             referencedColumnNames: id
-            constraintName: fk_userxrole_role
+            constraintName: fk_useraccount_x_role_role
+            onDelete: CASCADE

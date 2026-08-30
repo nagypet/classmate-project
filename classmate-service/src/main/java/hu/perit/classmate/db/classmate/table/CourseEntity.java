@@ -60,7 +60,7 @@ public class CourseEntity
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = COL_INSTRUCTOR_ID, nullable = false)
-    private UserEntity instructor;
+    private UserAccountEntity instructor;
 
     @Size(max = 255)
     @Column(name = COL_LOCATION)

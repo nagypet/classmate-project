@@ -39,4 +39,9 @@ public class Constants
 
     public static final String TRACE_ID = "traceId";
     public static final String BATCH_ID = "batchId";
+
+
+    public static final int USER_ACCOUNT_CONTROLLER_BASE = 1000;
+    public static final int USER_ACCOUNT_CONTROLLER_GET_MY_PROFILE = USER_ACCOUNT_CONTROLLER_BASE + 1;
+    public static final int USER_ACCOUNT_CONTROLLER_REGISTER_USER = USER_ACCOUNT_CONTROLLER_BASE + 2;
 }

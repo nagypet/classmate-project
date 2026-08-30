@@ -19,7 +19,6 @@ package hu.perit.classmate.config;
 import lombok.Generated;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.Strings;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -27,28 +26,18 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Getter
 @Generated // To disable counting in unit test coverage
-public enum Gender
+public enum Role
 {
-    MAN(1, "Férfi"),
-    WOMAN(2, "Nő");
+    ROLE_STUDENT(10),
+    ROLE_INSTRUCTOR(20),
+    ROLE_ADMIN(30),
+    ;
 
     private final long value;
-    private final String label;
 
-    public static Optional<Gender> fromValue(Long input)
+
+    public static Optional<Role> fromValue(Long input)
     {
-        return Arrays.stream(Gender.values()).filter(i -> i.value == input).findFirst();
-    }
-
-
-    public static Optional<Gender> fromLabel(String label)
-    {
-        return Arrays.stream(Gender.values()).filter(i -> Strings.CI.equals(i.label, label)).findFirst();
-    }
-
-
-    public static Optional<Gender> fromName(String name)
-    {
-        return Arrays.stream(Gender.values()).filter(i -> Strings.CI.equals(i.name(), name)).findFirst();
+        return Arrays.stream(Role.values()).filter(i -> i.value == input).findFirst();
     }
 }

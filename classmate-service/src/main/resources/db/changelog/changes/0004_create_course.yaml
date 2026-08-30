@@ -56,6 +56,6 @@ databaseChangeLog:
             baseTableName: course
             baseColumnNames: instructor_id
             referencedTableSchemaName: cmsa
-            referencedTableName: user
+            referencedTableName: user_account
             referencedColumnNames: id
             constraintName: fk_course_instructor

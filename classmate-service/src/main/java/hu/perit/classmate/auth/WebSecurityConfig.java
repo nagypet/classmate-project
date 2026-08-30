@@ -16,6 +16,7 @@
 
 package hu.perit.classmate.auth;
 
+import hu.perit.classmate.rest.api.UserAccountApi;
 import hu.perit.spvitamin.spring.security.auth.SimpleHttpSecurityBuilder;
 import hu.perit.spvitamin.spring.security.authprovider.localuserprovider.EnableLocalUserAuthProvider;
 import hu.perit.spvitamin.spring.security.oauth2.CustomOAuth2SuccessHandler;
@@ -73,27 +74,26 @@ public class WebSecurityConfig
     }
 
 
-//    @Bean
-//    @Order(3)
-//    public SecurityFilterChain configureTokenSecuredEndpoints(HttpSecurity http) throws Exception
-//    {
-//        SimpleHttpSecurityBuilder.newInstance(http)
-//                .scope(
-//                        UserAccountApi.BASE_URL + "/**",
-//                        "/frontend/forms/**",
-//                        "/h2/**",
-//                        "/frontend/forms/**",
-//                        "/frontend/sse/**",
-//                        "/app/browser/**"
-//                )
-//                // we do not use secure sessions here: each endpoint has to be authenticated again and again
-//                .ignorePersistedSecurity()
-//                .h2()
-//                .authorizeRequests(r -> r.requestMatchers("/frontend/sse/**").permitAll())
-//                .authorizeRequests(r -> r.requestMatchers("/app/browser/**").permitAll())
-//                .authorizeRequests(r -> r.anyRequest().authenticated())
-//                .jwtAuth();
-//
-//        return http.build();
-//    }
+    @Bean
+    @Order(3)
+    public SecurityFilterChain configureTokenSecuredEndpoints(HttpSecurity http) throws Exception
+    {
+        SimpleHttpSecurityBuilder.newInstance(http)
+                .scope(
+                        UserAccountApi.BASE_URL + "/**",
+                        "/h2/**",
+                        "/frontend/forms/**",
+                        "/frontend/sse/**",
+                        "/app/browser/**"
+                )
+                // we do not use secure sessions here: each endpoint has to be authenticated again and again
+                .ignorePersistedSecurity()
+                .h2()
+                .authorizeRequests(r -> r.requestMatchers("/frontend/sse/**").permitAll())
+                .authorizeRequests(r -> r.requestMatchers("/app/browser/**").permitAll())
+                .authorizeRequests(r -> r.anyRequest().authenticated())
+                .jwtAuth();
+
+        return http.build();
+    }
 }
