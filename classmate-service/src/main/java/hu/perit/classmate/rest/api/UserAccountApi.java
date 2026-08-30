@@ -1,7 +1,7 @@
 package hu.perit.classmate.rest.api;
 
-import hu.perit.classmate.model.CreateUserRequest;
-import hu.perit.classmate.model.UserProfile;
+import hu.perit.classmate.rest.model.CreateUserRequest;
+import hu.perit.classmate.rest.model.UserProfile;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;

@@ -162,32 +162,14 @@ import cz.habarta.typescript.generator.TypeScriptOutputKind
 generateTypeScript {
     jsonLibrary = JsonLibrary.jackson3
     classPatterns = [
-            'com.innodox.mebil.rest.model.**',
-            'com.innodox.mebil.model.**'
+            'hu.perit.classmate.rest.model.**'
     ]
     customTypeNaming = [
-            'com.innodox.mebil.rest.model.DashboardData$NewRegistrationsPanel:DashboardData.NewRegistrationsPanel',
-            'com.innodox.mebil.rest.model.DashboardData$ExpiredActivationsPanel:DashboardData.ExpiredActivationsPanel',
-            'com.innodox.mebil.rest.model.DashboardData$SentInvoicesPanel:DashboardData.SentInvoicesPanel',
-            'com.innodox.mebil.rest.model.DashboardData$ExpiredInvoicesPanel:DashboardData.ExpiredInvoicesPanel',
-            'com.innodox.mebil.rest.model.DashboardData$DueInvoicesPanel:DashboardData.DueInvoicesPanel',
-            'com.innodox.mebil.rest.model.DashboardData$MyTasksPanel:DashboardData.MyTasksPanel',
-            'com.innodox.mebil.rest.model.DashboardData$ActivationData:DashboardData.ActivationData',
-            'com.innodox.mebil.rest.model.DashboardData$RegistrationData:DashboardData.RegistrationData',
-            'com.innodox.mebil.rest.model.DashboardData$InvoiceData:DashboardData.InvoiceData',
-            'com.innodox.mebil.rest.model.DashboardData$TaskData:DashboardData.TaskData',
-            'com.innodox.mebil.rest.model.DashboardData$ChartData:DashboardData.ChartData',
-            'com.innodox.mebil.rest.model.DashboardData$ChartData$Dataset:DashboardData.ChartData.Dataset',
-            'com.innodox.mebil.rest.model.DashboardData$ChartData$Dataset$DataPoint:DashboardData.ChartData.Dataset.DataPoint',
-            'com.innodox.mebil.rest.model.GetSupportedCountriesResponse$Country:GetSupportedCountriesResponse.Country',
-            'com.innodox.mebil.rest.model.InvoiceResource$InvoiceRelations:InvoiceResource.InvoiceRelations',
-            'com.innodox.mebil.rest.model.UserAccountResource$UserAccountRelations:UserAccountResource.UserAccountRelations',
-            'hu.perit.ngface.core.widget.input.GenericValueSet$Item:GenericValueSet.Item',
     ]
-    outputFile = 'build/mebil-service-models.ts'
+    outputFile = 'build/classmate-service-models.ts'
     outputFileType = TypeScriptFileType.implementationFile
     outputKind = TypeScriptOutputKind.module
-    namespace = 'MebilService'
+    namespace = 'ClassMateService'
     //disableTaggedUnions = true
     optionalProperties = OptionalProperties.useSpecifiedAnnotations
     optionalAnnotations = [

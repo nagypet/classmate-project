@@ -1,8 +1,8 @@
 package hu.perit.classmate.rest.controller;
 
 import hu.perit.classmate.config.Constants;
-import hu.perit.classmate.model.CreateUserRequest;
-import hu.perit.classmate.model.UserProfile;
+import hu.perit.classmate.rest.model.CreateUserRequest;
+import hu.perit.classmate.rest.model.UserProfile;
 import hu.perit.classmate.rest.api.UserAccountApi;
 import hu.perit.classmate.service.api.UserAccountService;
 import hu.perit.spvitamin.core.exception.CheckedExceptionConverter;
