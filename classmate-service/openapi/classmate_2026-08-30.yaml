@@ -1,0 +1,809 @@
+openapi: 3.1.0
+info:
+  title: ClassMate
+  description: ClassMate API
+  contact:
+    url: https://perit.hu
+  license:
+    name: perit.hu
+  version: "1.0"
+servers:
+- url: https://localhost:8501
+  description: Generated server url
+tags:
+- name: keystore-api-controller
+  description: Keystore REST API
+- name: auth-api-controller
+  description: Authentication and authorization
+- name: admin-api-controller
+  description: REST API for use by the admin-gui
+- name: authentication-repository-controller
+  description: Provides the list of configured authentication methods
+paths:
+  /api/user-accounts:
+    get:
+      tags:
+      - user-account-controller
+      summary: getMyProfile() - Returns the profile of the currently logged in user
+      operationId: getMyProfile
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "400":
+          description: Invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "403":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+      security:
+      - bearer: []
+    post:
+      tags:
+      - user-account-controller
+      summary: createUserAccount() - Creates an account for the currently logged in
+        user
+      operationId: createUserAccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserRequest"
+        required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "400":
+          description: Invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "403":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+      security:
+      - bearer: []
+  /api/spvitamin/truststore/certificate:
+    post:
+      tags:
+      - keystore-api-controller
+      summary: Import a certificate into the server truststore
+      operationId: importCertificateIntoTruststoreUsingPOST
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ImportCertificateRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/KeystoreEntry"
+        "401":
+          description: Invalid credentials
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "403":
+          description: Authenticated user is not allowed to perform the operation!
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+      security:
+      - bearer: []
+  /api/spvitamin/keystore/privatekey:
+    post:
+      tags:
+      - keystore-api-controller
+      summary: Import a private key into the server keystore
+      operationId: importCertificateIntoKeystoreUsingPOST
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ImportCertificateRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/KeystoreEntry"
+        "401":
+          description: Invalid credentials
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "403":
+          description: Authenticated user is not allowed to perform the operation!
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+      security:
+      - bearer: []
+  /api/spvitamin/keystore/certificates:
+    post:
+      tags:
+      - keystore-api-controller
+      summary: Retrieve content of a certificate file
+      operationId: readEntriesFromCertificateFileUsingPOST
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CertificateFile"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/KeystoreEntry"
+        "401":
+          description: Invalid credentials
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "403":
+          description: Authenticated user is not allowed to perform the operation!
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+      security:
+      - bearer: []
+  /api/spvitamin/admin/shutdown:
+    post:
+      tags:
+      - admin-api-controller
+      summary: Shuts down the server.
+      operationId: shutdown
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Invalid credentials
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "403":
+          description: Authenticated user is not allowed to perform the operation!
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+      security:
+      - bearer: []
+  /api/spvitamin/admin/csp_violations:
+    post:
+      tags:
+      - admin-api-controller
+      summary: Logs CSP violations
+      operationId: cspViolationsUsingPOST
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+        required: true
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+  /api/spvitamin/truststore:
+    get:
+      tags:
+      - keystore-api-controller
+      summary: Retrieve truststore content
+      operationId: retrieveTruststoreEntriesUsingGET
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/KeystoreEntry"
+        "401":
+          description: Invalid credentials
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "403":
+          description: Authenticated user is not allowed to perform the operation!
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+      security:
+      - bearer: []
+  /api/spvitamin/oauth2/authorization:
+    get:
+      tags:
+      - o-auth-proxy-controller
+      operationId: authorization
+      parameters:
+      - name: provider
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+  /api/spvitamin/keystore:
+    get:
+      tags:
+      - keystore-api-controller
+      summary: Retrieve keystore content
+      operationId: retrieveKeystoreEntriesUsingGET
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/KeystoreEntry"
+        "401":
+          description: Invalid credentials
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "403":
+          description: Authenticated user is not allowed to perform the operation!
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+      security:
+      - bearer: []
+  /api/spvitamin/authentication-repository:
+    get:
+      tags:
+      - authentication-repository-controller
+      summary: getAuthenticationRepository() - Provides the list of configured authentication
+        methods
+      operationId: getAuthenticationRepository
+      responses:
+        "200":
+          description: Success
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationRepository"
+        "400":
+          description: Bad request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+  /api/spvitamin/authenticate:
+    get:
+      tags:
+      - auth-api-controller
+      summary: authenticate() - User authenticate
+      operationId: authenticateUsingGET
+      parameters:
+      - name: traceID
+        in: header
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizationToken"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+      security:
+      - basic: []
+      - bearer: []
+  /api/spvitamin/admin/version:
+    get:
+      tags:
+      - admin-api-controller
+      summary: Retrieve version info
+      operationId: retrieveVersionInfoUsingGET
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+  /api/spvitamin/admin/settings:
+    get:
+      tags:
+      - admin-api-controller
+      summary: Retrieve server settings
+      operationId: retrieveServerSettingsUsingGET
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ServerSettingsResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "403":
+          description: Authenticated user is not allowed to perform the operation!
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+      security:
+      - bearer: []
+  /api/spvitamin/truststore/certificate/{alias}:
+    delete:
+      tags:
+      - keystore-api-controller
+      summary: Remove a certificate from the server truststore
+      operationId: removeCertificateFromTruststoreUsingDELETE
+      parameters: []
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/KeystoreEntry"
+        "401":
+          description: Invalid credentials
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "403":
+          description: Authenticated user is not allowed to perform the operation!
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+      security:
+      - bearer: []
+  /api/spvitamin/keystore/privatekey/{alias}:
+    delete:
+      tags:
+      - keystore-api-controller
+      summary: Remove a private key from the server keystore
+      operationId: removeCertificateFromKeystoreUsingDELETE
+      parameters: []
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/KeystoreEntry"
+        "401":
+          description: Invalid credentials
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "403":
+          description: Authenticated user is not allowed to perform the operation!
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestExceptionResponse"
+      security:
+      - bearer: []
+components:
+  schemas:
+    CreateUserRequest:
+      type: object
+      properties:
+        displayName:
+          type: string
+        email:
+          type: string
+        gender:
+          type: string
+          enum:
+          - MAN
+          - WOMAN
+        birthdate:
+          type: string
+          format: date
+    RestExceptionResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          format: int32
+        error: {}
+        path:
+          type: string
+        traceId:
+          type: string
+        exception:
+          $ref: "#/components/schemas/ServerExceptionProperties"
+        type:
+          type: string
+        message:
+          type: string
+    ServerExceptionProperties:
+      type: object
+      properties:
+        message:
+          type: string
+        exceptionClass:
+          type: string
+        superClasses:
+          type: array
+          items:
+            type: string
+        stackTrace:
+          type: array
+          items:
+            type: object
+            properties:
+              classLoaderName:
+                type: string
+              moduleName:
+                type: string
+              moduleVersion:
+                type: string
+              methodName:
+                type: string
+              fileName:
+                type: string
+              lineNumber:
+                type: integer
+                format: int32
+              className:
+                type: string
+              nativeMethod:
+                type: boolean
+        cause:
+          $ref: "#/components/schemas/ServerExceptionProperties"
+    UserProfile:
+      type: object
+      properties:
+        userId:
+          type: string
+        displayName:
+          type: string
+        email:
+          type: string
+        gender:
+          type: string
+          enum:
+          - MAN
+          - WOMAN
+        birthdate:
+          type: string
+          format: date
+        roles:
+          type: array
+          items:
+            type: string
+            enum:
+            - ROLE_STUDENT
+            - ROLE_INSTRUCTOR
+            - ROLE_ADMIN
+          uniqueItems: true
+    CertificateFile:
+      type: object
+      properties:
+        content:
+          type: string
+        password:
+          type: string
+    ImportCertificateRequest:
+      type: object
+      properties:
+        certificateFile:
+          $ref: "#/components/schemas/CertificateFile"
+        alias:
+          type: string
+    CertInfo:
+      type: object
+      properties:
+        issuer:
+          type: string
+        subject:
+          type: string
+        validFrom:
+          type: string
+          format: date-time
+        validTo:
+          type: string
+          format: date-time
+        valid:
+          type: boolean
+        issuerCN:
+          type: string
+        subjectCN:
+          type: string
+    KeystoreEntry:
+      type: object
+      properties:
+        alias:
+          type: string
+        password:
+          type: string
+        inUse:
+          type: boolean
+        type:
+          type: string
+          enum:
+          - PRIVATE_KEY_ENTRY
+          - SECRET_KEY_ENTRY
+          - TRUSTED_CERTIFICATE_ENTRY
+        chain:
+          type: array
+          items:
+            $ref: "#/components/schemas/CertInfo"
+        valid:
+          type: boolean
+    AuthenticationRepository:
+      type: object
+      properties:
+        authenticationTypes:
+          type: array
+          items:
+            $ref: "#/components/schemas/AuthenticationType"
+    AuthenticationType:
+      type: object
+      properties:
+        type:
+          type: string
+        label:
+          type: string
+        provider:
+          type: string
+        grantTypes:
+          type: array
+          items:
+            type: string
+    AuthorizationToken:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - JWT
+          - ACCESS
+          - REFRESH
+        sub:
+          type: string
+        jwt:
+          type: string
+        iat:
+          type: string
+          format: date-time
+        exp:
+          type: string
+          format: date-time
+        uid:
+          type: string
+        clientId:
+          type: string
+        rls:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        scope:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        source:
+          type: string
+        sid:
+          type: string
+        additionalClaims:
+          type: object
+          additionalProperties: {}
+        ext:
+          type: object
+          additionalProperties: {}
+        preferred_username:
+          type: string
+        credential_type:
+          type: string
+          enum:
+          - UNKNOWN
+          - ANONYMOUS
+          - BASIC
+          - BEARER
+          - AT_IN_COOKIE
+          - RT_IN_COOKIE
+          - API_KEY
+          - OAUTH2
+    ServerParameter:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+        link:
+          type: boolean
+    ServerSettingsResponse:
+      type: object
+      properties:
+        serverParameters:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: "#/components/schemas/ServerParameter"
+            uniqueItems: true
+  securitySchemes:
+    basic:
+      type: http
+      scheme: basic
+    bearer:
+      type: http
+      scheme: bearer
