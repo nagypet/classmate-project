@@ -87,7 +87,7 @@ security:
   additional-security-headers:
     Content-Security-Policy: "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src * 'unsafe-inline'; img-src * data: blob:; font-src * data:; connect-src 'self'; object-src 'none'; frame-ancestors 'self'; base-uri 'self'; report-uri /api/spvitamin/admin/csp_violations;"
     Permissions-Policy: "accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), display-capture=(), document-domain=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=()"
-  allowed-origins: "https://demo.microdms.com"
+  allowed-origins: "https://classmate.perit.hu"
   allowed-headers: "*"
   allowed-methods: "OPTIONS, GET, POST, PUT, DELETE, PATCH"
   swagger-access: ADMIN

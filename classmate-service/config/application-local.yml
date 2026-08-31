@@ -62,6 +62,7 @@ admin:
 #-----------------------------------------------------------------------------------------------------------------------
 security:
   production-mode: false
+  allowed-origins: "*"
   swagger-access: "*"
   management-endpoints-access: "*"
   admin-gui-access: "*"

@@ -89,6 +89,7 @@ public class WebSecurityConfig
                 // we do not use secure sessions here: each endpoint has to be authenticated again and again
                 .ignorePersistedSecurity()
                 .h2()
+                .authorizeRequests(r -> r.requestMatchers("/frontend/forms/**").permitAll())
                 .authorizeRequests(r -> r.requestMatchers("/frontend/sse/**").permitAll())
                 .authorizeRequests(r -> r.requestMatchers("/app/browser/**").permitAll())
                 .authorizeRequests(r -> r.anyRequest().authenticated())

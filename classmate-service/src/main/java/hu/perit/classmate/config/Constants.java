@@ -44,4 +44,7 @@ public class Constants
     public static final int USER_ACCOUNT_CONTROLLER_BASE = 1000;
     public static final int USER_ACCOUNT_CONTROLLER_GET_MY_PROFILE = USER_ACCOUNT_CONTROLLER_BASE + 1;
     public static final int USER_ACCOUNT_CONTROLLER_REGISTER_USER = USER_ACCOUNT_CONTROLLER_BASE + 2;
+
+    public static final int TITLEBAR_CONTROLLER_BASE = 2000;
+    public static final int TITLEBAR_CONTROLLER_GET_FORM = TITLEBAR_CONTROLLER_BASE + 1;
 }

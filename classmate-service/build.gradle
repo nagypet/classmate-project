@@ -67,6 +67,11 @@ dependencies {
     implementation project(':spvitamin-spring-data')
     implementation project(':spvitamin-spring-cloud-feign')
 
+    // ngface as subproject
+    implementation project(':ngface-core')
+    implementation project(':ngface-rest')
+    implementation project(':ngface-data-jpa')
+
     // Lombok
     compileOnly libs.lombok
     testCompileOnly libs.lombok
