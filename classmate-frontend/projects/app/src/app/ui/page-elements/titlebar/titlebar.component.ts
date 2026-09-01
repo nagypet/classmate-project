@@ -84,6 +84,10 @@ export class TitlebarComponent extends FormBaseComponent implements OnInit, OnDe
     console.log(`onTitlebarActionClick()`, $event.id);
     switch ($event.id)
     {
+      case 'register':
+        this.router.navigate([routes.register]);
+        break;
+
       case 'login':
         this.router.navigate([routes.login]);
         break;

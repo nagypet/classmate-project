@@ -32,10 +32,20 @@ import java.time.LocalDate;
 @Data
 public class RegistrationFormComponentDTO extends ComponentDTO
 {
+    public static final String USER_NAME = "username";
+    public static final String PASSWORD = "password";
     public static final String DISPLAY_NAME_ID = "display-name";
     public static final String EMAIL_ID = "email";
     public static final String BIRTHDATE_ID = "birthdate";
     public static final String GENDER_ID = "gender";
+
+    private boolean isNewUser;
+
+    @DTOValue(id = USER_NAME)
+    private String username;
+
+    @DTOValue(id = PASSWORD)
+    private String password;
 
     @DTOValue(id = DISPLAY_NAME_ID)
     private String displayName;

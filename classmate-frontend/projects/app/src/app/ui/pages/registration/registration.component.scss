@@ -25,22 +25,9 @@ $panel-width: 300px;
   background: linear-gradient(170deg, var(--app-primary-palette-800), var(--app-primary-palette-700), var(--app-primary-palette-600), var(--app-primary-palette-500), var(--app-primary-palette-400));
 }
 
-.logo {
-  width: $panel-width;
-  margin-top: 100px;
-  margin-bottom: 100px;
-}
-.logo.phone {
-  width: auto;
-  height: 100px;
-  margin-top: 20px;
-  margin-bottom: 30px;
-}
-.logo.phone.landscape {
-  display: none;
-}
 
 .login-form {
+  margin-top: 100px;
   display: flex;
   align-items: center;
   justify-content: center;

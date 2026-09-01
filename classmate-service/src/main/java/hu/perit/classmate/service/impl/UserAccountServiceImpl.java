@@ -5,12 +5,14 @@ import hu.perit.classmate.config.Role;
 import hu.perit.classmate.db.classmate.table.RoleEntity;
 import hu.perit.classmate.db.classmate.table.UserAccountEntity;
 import hu.perit.classmate.db.classmate.table.UserAccountXRoleEntity;
-import hu.perit.classmate.rest.model.CreateUserAccountRequest;
+import hu.perit.classmate.model.CreateUserAccountRequest;
+import hu.perit.classmate.model.RegisterAuthenticatedUserRequest;
 import hu.perit.classmate.rest.model.UserProfile;
 import hu.perit.classmate.service.api.UserAccountService;
 import hu.perit.classmate.service.impl.entity.RoleEntityServiceImpl;
 import hu.perit.classmate.service.impl.entity.UserAccountEntityServiceImpl;
 import hu.perit.classmate.service.impl.entity.UserAccountXRoleEntityServiceImpl;
+import hu.perit.classmate.util.ClassMatePasswordEncoder;
 import hu.perit.spvitamin.spring.exception.CannotProcessException;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import lombok.RequiredArgsConstructor;
@@ -59,7 +61,7 @@ public class UserAccountServiceImpl implements UserAccountService
 
     @Override
     @Transactional
-    public UserProfile createUserAccount(AuthenticatedUser authenticatedUser, CreateUserAccountRequest request)
+    public UserProfile registerAuthenticatedUser(AuthenticatedUser authenticatedUser, RegisterAuthenticatedUserRequest request)
     {
         UserAccountEntity userAccountEntity = this.userAccountEntityService.findByAuthProviderAndUserName(authenticatedUser.getSource(), authenticatedUser.getUsername()).orElse(null);
         if (userAccountEntity != null)
@@ -80,6 +82,36 @@ public class UserAccountServiceImpl implements UserAccountService
         entity.setGender(request.getGender() != null ? request.getGender() : Gender.fromName(authenticatedUser.getAdditionalClaim("gender", String.class).orElse(null)).orElse(null));
         entity.setBirthdate(request.getBirthdate() != null ? request.getBirthdate() : authenticatedUser.getAdditionalClaim("birthdate", LocalDate.class).orElse(null));
         entity.setEmail(StringUtils.defaultIfBlank(request.getEmail(), authenticatedUser.getAdditionalClaim("email", String.class).orElse(null)));
+        UserAccountEntity savedUserAccountEntity = this.userAccountEntityService.save(entity);
+
+        // UserAccountXRoleEntity
+        RoleEntity roleEntity = this.roleEntityService.findByRole(Role.ROLE_STUDENT).orElse(null);
+        if (roleEntity != null)
+        {
+            UserAccountXRoleEntity xRoleEntity = new UserAccountXRoleEntity();
+            xRoleEntity.setRoleId(roleEntity.getId());
+            xRoleEntity.setUserId(savedUserAccountEntity.getId());
+            this.userAccountXRoleEntityService.save(xRoleEntity);
+        }
+
+        return mapEntityToProfile(savedUserAccountEntity);
+    }
+
+
+    @Override
+    @Transactional
+    public UserProfile createUserAccount(CreateUserAccountRequest request)
+    {
+        // UserAccountEntity
+        UserAccountEntity entity = new UserAccountEntity();
+        entity.setAuthProvider("classmate");
+        entity.setUserName(request.getUsername());
+        ClassMatePasswordEncoder passwordEncoder = new ClassMatePasswordEncoder();
+        entity.setEncryptedPassword(passwordEncoder.encode(request.getPassword()));
+        entity.setDisplayName(request.getDisplayName());
+        entity.setGender(request.getGender());
+        entity.setBirthdate(request.getBirthdate());
+        entity.setEmail(request.getEmail());
         UserAccountEntity savedUserAccountEntity = this.userAccountEntityService.save(entity);
 
         // UserAccountXRoleEntity

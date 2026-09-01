@@ -17,11 +17,14 @@
 package hu.perit.classmate.ngface.registrationform;
 
 import hu.perit.classmate.config.Gender;
-import hu.perit.classmate.rest.model.CreateUserAccountRequest;
+import hu.perit.classmate.model.CreateUserAccountRequest;
+import hu.perit.classmate.model.RegisterAuthenticatedUserRequest;
 import hu.perit.classmate.rest.model.UserProfile;
 import hu.perit.classmate.service.api.UserAccountService;
 import hu.perit.ngface.core.controller.ComponentController;
 import hu.perit.ngface.core.widget.input.Select;
+import hu.perit.spvitamin.spring.exception.CannotProcessException;
+import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,15 +48,25 @@ public class RegistrationFormComponentController implements ComponentController<
     @Override
     public RegistrationFormComponentDTO getForm(Long id)
     {
-        UserProfile myProfile = this.userAccountService.getMyProfile(this.authorizationService.getAuthenticatedUser());
-
         // The data
         RegistrationFormComponentDTO data = new RegistrationFormComponentDTO();
 
-        data.setDisplayName(myProfile.getDisplayName());
-        data.setEmail(myProfile.getEmail());
-        data.setBirthdate(myProfile.getBirthdate());
-        data.setGender(getGenderData(myProfile.getGender()));
+        try
+        {
+            UserProfile myProfile = this.userAccountService.getMyProfile(this.authorizationService.getAuthenticatedUser());
+
+            data.setNewUser(false);
+            data.setDisplayName(myProfile.getDisplayName());
+            data.setEmail(myProfile.getEmail());
+            data.setBirthdate(myProfile.getBirthdate());
+            data.setGender(getGenderData(myProfile.getGender()));
+        }
+        catch (CannotProcessException e)
+        {
+            // New registration
+            data.setNewUser(true);
+            data.setGender(getGenderData(null));
+        }
 
         return data;
     }
@@ -76,11 +89,26 @@ public class RegistrationFormComponentController implements ComponentController<
     {
         log.info("Form submitted: {}", data);
 
-        CreateUserAccountRequest request = new CreateUserAccountRequest();
-        request.setDisplayName(data.getDisplayName());
-        request.setEmail(data.getEmail());
-        request.setBirthdate(data.getBirthdate());
-        request.setGender(Gender.fromName(data.getGender().getSelected()).orElse(null));
-        this.userAccountService.createUserAccount(this.authorizationService.getAuthenticatedUser(), request);
+        AuthenticatedUser authenticatedUser = this.authorizationService.getAuthenticatedUser();
+        if (authenticatedUser.isAnonymous())
+        {
+            CreateUserAccountRequest request = new CreateUserAccountRequest();
+            request.setUsername(data.getUsername());
+            request.setPassword(data.getPassword());
+            request.setDisplayName(data.getDisplayName());
+            request.setEmail(data.getEmail());
+            request.setBirthdate(data.getBirthdate());
+            request.setGender(Gender.fromName(data.getGender().getSelected()).orElse(null));
+            this.userAccountService.createUserAccount(request);
+        }
+        else
+        {
+            RegisterAuthenticatedUserRequest request = new RegisterAuthenticatedUserRequest();
+            request.setDisplayName(data.getDisplayName());
+            request.setEmail(data.getEmail());
+            request.setBirthdate(data.getBirthdate());
+            request.setGender(Gender.fromName(data.getGender().getSelected()).orElse(null));
+            this.userAccountService.registerAuthenticatedUser(authenticatedUser, request);
+        }
     }
 }

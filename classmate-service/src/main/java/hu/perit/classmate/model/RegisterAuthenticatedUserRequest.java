@@ -1,4 +1,4 @@
-package hu.perit.classmate.rest.model;
+package hu.perit.classmate.model;
 
 import hu.perit.classmate.config.Gender;
 import lombok.Data;
@@ -6,7 +6,7 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-public class CreateUserAccountRequest
+public class RegisterAuthenticatedUserRequest
 {
     private String displayName;
     private String email;

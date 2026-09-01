@@ -37,11 +37,34 @@ public class RegistrationFormComponentView implements ComponentView
     @Override
     public Form getForm()
     {
-        return new Form("registration-form")
+        Form form = new Form("registration-form");
+
+        if (this.data.isNewUser())
+        {
+            form
+                    .addWidget(new TextInput(RegistrationFormComponentDTO.USER_NAME)
+                            .label("Felhasználónév")
+                            .placeholder("Felhasználónév")
+                            .addValidator(new Required("A felhasználónév megadása kötelező!"))
+                            .addValidator(new Size("Maximális méret 255 karakter!").max(255))
+                            .enabled(StringUtils.isBlank(this.data.getDisplayName()))
+                    )
+                    .addWidget(new TextInput(RegistrationFormComponentDTO.PASSWORD)
+                            .label("Jelszó")
+                            .placeholder("Jelszó")
+                            .addValidator(new Required("A jelszó megadása kötelező!"))
+                            .addValidator(new Size("Legalább 4 karakter!").min(4))
+                            .addValidator(new Size("Maximális méret 40 karakter!").max(40))
+                            .enabled(StringUtils.isBlank(this.data.getDisplayName()))
+                    )
+            ;
+        }
+
+        form
                 .addWidget(new TextInput(RegistrationFormComponentDTO.DISPLAY_NAME_ID)
                         .value(this.data.getDisplayName())
                         .label("Név")
-                        .placeholder("Hogyan szólíthatunk?")
+                        .placeholder("Teljes neved")
                         .addValidator(new Required("A név megadása kötelező!"))
                         .addValidator(new Size("Maximális méret 255 karakter!").max(255))
                         .enabled(StringUtils.isBlank(this.data.getDisplayName()))
@@ -64,6 +87,8 @@ public class RegistrationFormComponentView implements ComponentView
                         .addValidator(new Required("Válassz egyet a listából!"))
                 )
                 .addWidget(new Button("button-register").label("Regisztráció").style(Button.Style.PRIMARY))
-                ;
+        ;
+
+        return form;
     }
 }

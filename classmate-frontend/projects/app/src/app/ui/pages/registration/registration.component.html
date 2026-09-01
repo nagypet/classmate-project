@@ -15,11 +15,16 @@
   -->
 
 <div responsiveClass="login-form-container">
-  <img responsiveClass="logo" src="{{getLogoUrl()}}">
   <div responsiveClass="login-form">
     <div responsiveClass="login-panel">
       <div responsiveClass="system-name">ClassMate Regisztráció</div>
       <ngface-form [formdata]="formData">
+        @if (isWidgetAvailable('username')) {
+          <ngface-text-input [formdata]="formData" [focused]=true widgetid="username"/>
+        }
+        @if (isWidgetAvailable('password')) {
+        <ngface-text-input [formdata]="formData" [focused]=true widgetid="password"/>
+        }
         <ngface-text-input [formdata]="formData" [focused]=true widgetid="display-name"/>
         <ngface-text-input [formdata]="formData" widgetid="email"/>
         <ngface-select [formdata]="formData" widgetid="gender"/>

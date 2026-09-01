@@ -41,7 +41,8 @@ import java.util.stream.Collectors;
 @Setter
 @Entity
 @Table(name = UserAccountEntity.TABLE_NAME, schema = Constants.SCHEMA, indexes = {
-        @Index(name = UserAccountEntity.IX_01, columnList = UserAccountEntity.COL_AUTH_PROVIDER + "," + UserAccountEntity.COL_USER_NAME, unique = true)
+        @Index(name = UserAccountEntity.IX_01, columnList = UserAccountEntity.COL_AUTH_PROVIDER + "," + UserAccountEntity.COL_USER_NAME, unique = true),
+        @Index(name = UserAccountEntity.IX_02, columnList = UserAccountEntity.COL_EMAIL, unique = true),
 })
 @EntityListeners(AuditingEntityListener.class)
 @Generated // To disable counting in unit test coverage
@@ -50,10 +51,12 @@ public class UserAccountEntity
     public static final String TABLE_NAME = "user_account";
 
     public static final String IX_01 = "ix_user_account_01";
+    public static final String IX_02 = "ix_user_account_02";
 
     public static final String COL_ID = "id";
     public static final String COL_AUTH_PROVIDER = "auth_provider";
     public static final String COL_USER_NAME = "user_name";
+    public static final String COL_ENCRYPTED_PASSWORD = "encrypted_password";
     public static final String COL_DISPLAY_NAME = "display_name";
     public static final String COL_EMAIL = "email";
     public static final String COL_GENDER = "gender";
@@ -76,6 +79,10 @@ public class UserAccountEntity
     @Size(max = 255)
     @Column(name = COL_USER_NAME, nullable = false)
     private String userName;
+
+    @Size(max = 200)
+    @Column(name = COL_ENCRYPTED_PASSWORD, nullable = true)
+    private String encryptedPassword;
 
     @Size(max = 255)
     @Column(name = COL_DISPLAY_NAME, nullable = false)

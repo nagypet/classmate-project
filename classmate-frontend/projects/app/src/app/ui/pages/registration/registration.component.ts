@@ -19,7 +19,6 @@ import {Router} from '@angular/router';
 import {FormBaseComponent} from '../../../../../../ngface/src/lib/form/form-base.component';
 import {ResponsiveClassDirective} from '../../../../../../ngface/src/lib/directives/responsive-class-directive';
 import {UserAccountService} from '../../../core/services/useraccount.service';
-import {environment} from "../../../../environments/environment";
 import {RegistrationFormService} from "../../../core/services/registration-form.service";
 import {NgfaceFormComponent} from "../../../../../../ngface/src/lib/form/ngface-form/ngface-form.component";
 import {
@@ -92,11 +91,5 @@ export class RegistrationComponent extends FormBaseComponent implements OnInit
         console.error(error);
       }
     });
-  }
-
-
-  getLogoUrl(): string
-  {
-    return `themes/${environment.theme}/company_logo.png`;
   }
 }

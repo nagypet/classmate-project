@@ -16,6 +16,7 @@
 
 package hu.perit.classmate.ngface.titlebar.titlebar;
 
+import hu.perit.classmate.config.ActionEnum;
 import hu.perit.ngface.core.view.ComponentView;
 import hu.perit.ngface.core.widget.form.Form;
 import hu.perit.ngface.core.widget.table.Action;
@@ -40,8 +41,6 @@ public class TitlebarComponentView implements ComponentView
     public static final String TITLEBAR = "titlebar";
     public static final String MEBIL = "ClassMate";
     public static final String VERSION_100 = "1.0.0";
-    public static final String LOGIN = "login";
-    public static final String LOGOUT = "logout";
 
 
     @Override
@@ -73,11 +72,12 @@ public class TitlebarComponentView implements ComponentView
         List<Action> actions = new ArrayList<>();
         if (BooleanUtils.isTrue(anonymous))
         {
-            actions.add(new Action(LOGIN).icon(LOGIN).label("Login"));
+            actions.add(new Action(ActionEnum.LOGIN.getActionId()).icon("login").label("Belépés"));
+            actions.add(new Action(ActionEnum.REGISTER.getActionId()).icon("person_add").label("Regisztráció"));
         }
         else
         {
-            actions.add(new Action(LOGOUT).icon(LOGOUT).label("Logout"));
+            actions.add(new Action(ActionEnum.LOGOUT.getActionId()).icon("logout").label("Kilépés"));
         }
 
         return new Form(TITLEBAR)

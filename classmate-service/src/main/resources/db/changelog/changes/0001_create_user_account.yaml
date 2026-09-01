@@ -25,6 +25,9 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: encrypted_password
+                  type: VARCHAR(200)
+              - column:
                   name: display_name
                   type: varchar(255)
                   constraints:
@@ -75,3 +78,11 @@ databaseChangeLog:
                   name: auth_provider
               - column:
                   name: user_name
+        - createIndex:
+            schemaName: cmsa
+            tableName: user_account
+            indexName: ix_user_account_02
+            unique: true
+            columns:
+              - column:
+                  name: email

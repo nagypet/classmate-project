@@ -1,11 +1,9 @@
 package hu.perit.classmate.rest.controller;
 
 import hu.perit.classmate.config.Constants;
-import hu.perit.classmate.rest.model.CreateUserAccountRequest;
-import hu.perit.classmate.rest.model.UserProfile;
 import hu.perit.classmate.rest.api.UserAccountApi;
+import hu.perit.classmate.rest.model.UserProfile;
 import hu.perit.classmate.service.api.UserAccountService;
-import hu.perit.spvitamin.core.exception.CheckedExceptionConverter;
 import hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
@@ -26,14 +24,5 @@ public class UserAccountController implements UserAccountApi
     {
         AuthenticatedUser authenticatedUser = this.authorizationService.getAuthenticatedUser();
         return this.userAccountService.getMyProfile(authenticatedUser);
-    }
-
-
-    @Override
-    @LoggedRestMethod(eventId = Constants.USER_ACCOUNT_CONTROLLER_REGISTER_USER)
-    public UserProfile createUserAccount(CreateUserAccountRequest request)
-    {
-        AuthenticatedUser authenticatedUser = this.authorizationService.getAuthenticatedUser();
-        return CheckedExceptionConverter.invoke(() -> this.userAccountService.createUserAccount(authenticatedUser, request));
     }
 }
