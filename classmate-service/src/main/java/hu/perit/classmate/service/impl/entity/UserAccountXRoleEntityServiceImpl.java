@@ -13,8 +13,8 @@ public class UserAccountXRoleEntityServiceImpl implements UserAccountXRoleEntity
     private final UserAccountXRoleRepo repo;
 
     @Override
-    public UserAccountXRoleEntity save(UserAccountXRoleEntity userAccountXRoleEntity)
+    public UserAccountXRoleEntity save(UserAccountXRoleEntity entity)
     {
-        return null;
+        return this.repo.save(entity);
     }
 }

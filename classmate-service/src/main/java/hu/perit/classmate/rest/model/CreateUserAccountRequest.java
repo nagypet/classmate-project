@@ -6,7 +6,7 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-public class CreateUserRequest
+public class CreateUserAccountRequest
 {
     private String displayName;
     private String email;

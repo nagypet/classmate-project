@@ -1,6 +1,6 @@
 package hu.perit.classmate.rest.api;
 
-import hu.perit.classmate.rest.model.CreateUserRequest;
+import hu.perit.classmate.rest.model.CreateUserAccountRequest;
 import hu.perit.classmate.rest.model.UserProfile;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -37,6 +37,6 @@ public interface UserAccountApi
     )
     @StandardApiResponses200_400_401_403_500
     //------------------------------------------------------------------------------------------------------------------
-    UserProfile createUserAccount(@RequestBody @Valid CreateUserRequest request);
+    UserProfile createUserAccount(@RequestBody @Valid CreateUserAccountRequest request);
     //------------------------------------------------------------------------------------------------------------------
 }

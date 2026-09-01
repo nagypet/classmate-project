@@ -1,0 +1,10 @@
+#-----------------------------------------------------------------------------------------------------------------------
+# Security settings
+#-----------------------------------------------------------------------------------------------------------------------
+security:
+  oauth2:
+    providers:
+      google:
+        client-secret-file: c:/np/Settings/cloud.google.classmate/client_secret.txt
+      facebook:
+        client-secret-file: c:/np/Settings/facebook.classmate/app_secret.txt

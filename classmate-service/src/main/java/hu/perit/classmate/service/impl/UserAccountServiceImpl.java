@@ -5,7 +5,7 @@ import hu.perit.classmate.config.Role;
 import hu.perit.classmate.db.classmate.table.RoleEntity;
 import hu.perit.classmate.db.classmate.table.UserAccountEntity;
 import hu.perit.classmate.db.classmate.table.UserAccountXRoleEntity;
-import hu.perit.classmate.rest.model.CreateUserRequest;
+import hu.perit.classmate.rest.model.CreateUserAccountRequest;
 import hu.perit.classmate.rest.model.UserProfile;
 import hu.perit.classmate.service.api.UserAccountService;
 import hu.perit.classmate.service.impl.entity.RoleEntityServiceImpl;
@@ -15,7 +15,6 @@ import hu.perit.spvitamin.spring.exception.CannotProcessException;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,12 +40,15 @@ public class UserAccountServiceImpl implements UserAccountService
             return mapEntityToProfile(userAccountEntity);
         }
 
-        if (authenticatedUser.isAnonymous() || Strings.CI.equals(authenticatedUser.getSource(), "LOCALUSER"))
+        if (authenticatedUser.isAnonymous())
         {
             throw new CannotProcessException("This kind of user has no profile!");
         }
 
         return UserProfile.builder()
+                .registrationNeeded(true)
+                .authProvider(authenticatedUser.getSource())
+                .authSubject(authenticatedUser.getUsername())
                 .displayName(authenticatedUser.getDisplayName())
                 .email(authenticatedUser.getAdditionalClaim("email", String.class).orElse(null))
                 .gender(Gender.fromName(authenticatedUser.getAdditionalClaim("gender", String.class).orElse(null)).orElse(null))
@@ -57,7 +59,7 @@ public class UserAccountServiceImpl implements UserAccountService
 
     @Override
     @Transactional
-    public UserProfile createUserAccount(AuthenticatedUser authenticatedUser, CreateUserRequest request)
+    public UserProfile createUserAccount(AuthenticatedUser authenticatedUser, CreateUserAccountRequest request)
     {
         UserAccountEntity userAccountEntity = this.userAccountEntityService.findByAuthProviderAndUserName(authenticatedUser.getSource(), authenticatedUser.getUsername()).orElse(null);
         if (userAccountEntity != null)
@@ -65,7 +67,7 @@ public class UserAccountServiceImpl implements UserAccountService
             return mapEntityToProfile(userAccountEntity);
         }
 
-        if (authenticatedUser.isAnonymous() || Strings.CI.equals(authenticatedUser.getSource(), "LOCALUSER"))
+        if (authenticatedUser.isAnonymous())
         {
             throw new CannotProcessException("This kind of user cannot create user account!");
         }
@@ -97,6 +99,9 @@ public class UserAccountServiceImpl implements UserAccountService
     private static UserProfile mapEntityToProfile(UserAccountEntity entity)
     {
         return UserProfile.builder()
+                .registrationNeeded(false)
+                .authProvider(entity.getAuthProvider())
+                .authSubject(entity.getUserName())
                 .userId(entity.getId().toString())
                 .displayName(entity.getDisplayName())
                 .email(entity.getEmail())
@@ -122,9 +127,6 @@ public class UserAccountServiceImpl implements UserAccountService
                 .authorities(userAccountEntity.getRoles().stream().map(i -> new SimpleGrantedAuthority(i.name())).collect(Collectors.toSet()))
                 .anonymous(false)
                 .source(userAccountEntity.getAuthProvider())
-                .additionalClaim("email", userAccountEntity.getEmail())
-                .additionalClaim("birthdate", userAccountEntity.getBirthdate())
-                .additionalClaim("gender", userAccountEntity.getGender().name())
                 .credentialType(authenticatedUser.getCredentialType())
                 .build();
     }

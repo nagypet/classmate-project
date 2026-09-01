@@ -12,6 +12,9 @@ import java.util.Set;
 @Builder
 public class UserProfile
 {
+    private Boolean registrationNeeded;
+    private String authProvider;
+    private String authSubject;
     private String userId;
     private String displayName;
     private String email;

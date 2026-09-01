@@ -1,7 +1,7 @@
 package hu.perit.classmate.rest.controller;
 
 import hu.perit.classmate.config.Constants;
-import hu.perit.classmate.rest.model.CreateUserRequest;
+import hu.perit.classmate.rest.model.CreateUserAccountRequest;
 import hu.perit.classmate.rest.model.UserProfile;
 import hu.perit.classmate.rest.api.UserAccountApi;
 import hu.perit.classmate.service.api.UserAccountService;
@@ -31,7 +31,7 @@ public class UserAccountController implements UserAccountApi
 
     @Override
     @LoggedRestMethod(eventId = Constants.USER_ACCOUNT_CONTROLLER_REGISTER_USER)
-    public UserProfile createUserAccount(CreateUserRequest request)
+    public UserProfile createUserAccount(CreateUserAccountRequest request)
     {
         AuthenticatedUser authenticatedUser = this.authorizationService.getAuthenticatedUser();
         return CheckedExceptionConverter.invoke(() -> this.userAccountService.createUserAccount(authenticatedUser, request));

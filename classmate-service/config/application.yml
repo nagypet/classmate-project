@@ -65,7 +65,7 @@ server:
   fqdn: localhost
   port: 8501
   ssl:
-    enabled: true
+    enabled: false
     key-store: classpath:jks/server-keystore.jks
     key-store-password: changeit
     key-alias: localhost
@@ -106,7 +106,6 @@ security:
         display-name: Google
         issuer-uri: https://accounts.google.com
         client-id: 62961274523-fivf9rs9bcpgltp08s4blk1gpeteb381.apps.googleusercontent.com
-        client-secret-file: c:/np/Settings/cloud.google.classmate/client_secret.txt
         scopes:
           - openid
           - profile
@@ -114,7 +113,6 @@ security:
       facebook:
         display-name: Facebook
         client-id: 1023167934011362
-        client-secret-file: c:/np/Settings/facebook.classmate/app_secret.txt
         scopes:
           - public_profile
           - email

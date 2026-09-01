@@ -1,0 +1,10 @@
+<div responsiveClass="titlebar-container">
+  <ngface-titlebar [formdata]="formData" widgetid="titlebar"
+                   [logo]="getLogoUrl()"
+                   [selectedMenuItemId]="getSelectedMenuItemId()"
+                   (menuItemClick)="onTitlebarMenuItemClick($event)"
+                   (actionClick)="onTitlebarActionClick($event)"
+                   (ready)="onTitlebarReady()"
+                   [hidden]="!appReady"
+  ></ngface-titlebar>
+</div>
