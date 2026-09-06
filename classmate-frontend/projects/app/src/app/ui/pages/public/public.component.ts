@@ -18,6 +18,10 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ResponsiveClassDirective} from '../../../../../../ngface/src/lib/directives/responsive-class-directive';
 import {FormBaseComponent} from '../../../../../../ngface/src/lib/form/form-base.component';
 import {ChangeService} from '../../../core/services/change.service';
+import {AuthService} from "../../../../../../ngface/src/lib/services/auth/auth.service";
+import {Subscription} from "rxjs";
+import {UserAccountService} from "../../../core/services/useraccount.service";
+import {ClassMateService} from "../../../classmate-service-models";
 
 
 @Component({
@@ -31,12 +35,40 @@ import {ChangeService} from '../../../core/services/change.service';
 })
 export class PublicComponent extends FormBaseComponent implements OnInit, OnDestroy
 {
+  userName? = '';
+  userEmail? = '';
+  userRoles?: ClassMateService.Role[];
+
+  private subscriptions = new Array<Subscription | undefined>();
 
   constructor(
-    private changeService: ChangeService
+    private changeService: ChangeService,
+    private authService: AuthService,
+    private userAccountService: UserAccountService,
   )
   {
     super();
+
+    this.subscriptions.push(this.authService.token$.subscribe(authorizationToken =>
+    {
+      if (authorizationToken)
+      {
+        this.userAccountService.getMyProfile().subscribe({
+          next: (profile: ClassMateService.UserProfile) =>
+          {
+            this.userName = profile.displayName;
+            this.userEmail = profile.email;
+            this.userRoles = profile.roles;
+          }
+        });
+      }
+      else
+      {
+        this.userName = undefined;
+        this.userEmail = undefined;
+        this.userRoles = undefined;
+      }
+    }));
   }
 
   ngOnInit(): void
@@ -47,6 +79,6 @@ export class PublicComponent extends FormBaseComponent implements OnInit, OnDest
 
   ngOnDestroy(): void
   {
-    //this.sseChannel.close();
+    this.subscriptions.forEach(subscription => subscription?.unsubscribe());
   }
 }
