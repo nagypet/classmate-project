@@ -30,6 +30,8 @@ import {
 } from "../../../../../../ngface/src/lib/widgets/ngface-date-input/ngface-date-input.component";
 import {NgfaceButtonComponent} from "../../../../../../ngface/src/lib/widgets/ngface-button/ngface-button.component";
 import {routes} from "../../constants/constants";
+import {AuthService} from "../../../../../../ngface/src/lib/services/auth/auth.service";
+import {Ngface} from "../../../../../../ngface/src/lib/ngface-models";
 
 @Component({
   selector: 'app-registration',
@@ -53,6 +55,7 @@ export class RegistrationComponent extends FormBaseComponent implements OnInit
     private router: Router,
     private userAccountService: UserAccountService,
     private formService: RegistrationFormService,
+    private authService: AuthService
   )
   {
     super();
@@ -83,7 +86,16 @@ export class RegistrationComponent extends FormBaseComponent implements OnInit
       next: () =>
       {
         console.log('sumbitted');
-        this.router.navigate([routes.public]);
+        if (this.isWidgetAvailable('username') && this.isWidgetAvailable('password'))
+        {
+          const username = (submitData['username'] as Ngface.TextInput.Data).value!;
+          const password = (submitData['password'] as Ngface.TextInput.Data).value!;
+          this.authService.login(username, password).subscribe(() => this.router.navigate([routes.public]));
+        }
+        else
+        {
+          this.router.navigate([routes.public]);
+        }
       },
       error: (error) =>
       {

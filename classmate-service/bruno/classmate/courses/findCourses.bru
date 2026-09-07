@@ -1,11 +1,11 @@
 meta {
-  name: getMyProfile
+  name: findCourses
   type: http
   seq: 1
 }
 
 get {
-  url: {{url}}/api/user-accounts
+  url: {{url}}/api/courses
   body: none
   auth: inherit
 }
@@ -13,4 +13,5 @@ get {
 settings {
   encodeUrl: true
   timeout: 0
+  forwardAuthorizationHeader: false
 }

@@ -111,7 +111,6 @@ export class AuthService extends ConfigurableService<AuthConfig> implements Abst
    * Calling auth with basic header to retrieve token
    * @param username
    * @param password
-   * @param withInfo
    */
   login(username: string, password: string): Observable<void>
   {

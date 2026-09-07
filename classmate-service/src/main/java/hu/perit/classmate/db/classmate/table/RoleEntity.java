@@ -15,13 +15,11 @@ import lombok.Generated;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @Getter
 @Setter
 @Entity
 @Table(name = RoleEntity.TABLE_NAME, schema = Constants.SCHEMA, indexes = {
-        @Index(name = RoleEntity.IX_01, columnList = RoleEntity.COL_NAME, unique = true)
+        @Index(name = RoleEntity.IX_01, columnList = RoleEntity.COL_ROLE, unique = true)
 })
 @Generated // To disable counting in unit test coverage
 public class RoleEntity
@@ -31,16 +29,16 @@ public class RoleEntity
     public static final String IX_01 = "ix_role_01";
 
     public static final String COL_ID = "id";
-    public static final String COL_NAME = "role";
+    public static final String COL_ROLE = "role";
 
     @Id
     @GeneratedValue
     @NotNull
     @Column(name = COL_ID, nullable = false)
-    private UUID id;
+    private Long id;
 
     @NotNull
-    @Column(name = COL_NAME, nullable = false, unique = true)
+    @Column(name = COL_ROLE, nullable = false, unique = true)
     @Convert(converter = RoleConverter.class)
     private Role role;
 }

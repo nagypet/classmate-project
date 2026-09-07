@@ -63,6 +63,11 @@ databaseChangeLog:
               - column:
                   name: updated_at
                   type: timestamp
+              - column:
+                  constraints:
+                    nullable: false
+                  name: rec_version
+                  type: BIGINT
         - addUniqueConstraint:
             schemaName: cmsa
             tableName: user_account

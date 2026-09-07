@@ -16,6 +16,7 @@
 
 package hu.perit.classmate.auth;
 
+import hu.perit.classmate.rest.api.CourseApi;
 import hu.perit.classmate.rest.api.UserAccountApi;
 import hu.perit.spvitamin.spring.security.auth.SimpleHttpSecurityBuilder;
 import hu.perit.spvitamin.spring.security.authprovider.localuserprovider.EnableLocalUserAuthProvider;
@@ -81,6 +82,7 @@ public class WebSecurityConfig
         SimpleHttpSecurityBuilder.newInstance(http)
                 .scope(
                         UserAccountApi.BASE_URL + "/**",
+                        CourseApi.BASE_URL + "/**",
                         "/h2/**",
                         "/frontend/forms/**",
                         "/frontend/sse/**",

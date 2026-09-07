@@ -29,8 +29,8 @@ import java.util.Optional;
 @Generated // To disable counting in unit test coverage
 public enum Gender
 {
-    MAN(1, "Férfi"),
-    WOMAN(2, "Nő");
+    MALE(1, "Férfi"),
+    FEMALE(2, "Nő");
 
     private final long value;
     private final String label;

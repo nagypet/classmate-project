@@ -10,7 +10,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: uuid
+                  type: BIGINT
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -38,7 +38,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  valueComputed: gen_random_uuid()
+                  value: "10"
               - column:
                   name: role
                   value: "10"
@@ -48,7 +48,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  valueComputed: gen_random_uuid()
+                  value: "20"
               - column:
                   name: role
                   value: "20"
@@ -58,7 +58,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  valueComputed: gen_random_uuid()
+                  value: "30"
               - column:
                   name: role
                   value: "30"

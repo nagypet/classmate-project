@@ -7,7 +7,6 @@ import hu.perit.classmate.db.classmate.converter.GenderConverter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -22,16 +21,8 @@ import lombok.AccessLevel;
 import lombok.Generated;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -44,9 +35,8 @@ import java.util.stream.Collectors;
         @Index(name = UserAccountEntity.IX_01, columnList = UserAccountEntity.COL_AUTH_PROVIDER + "," + UserAccountEntity.COL_USER_NAME, unique = true),
         @Index(name = UserAccountEntity.IX_02, columnList = UserAccountEntity.COL_EMAIL, unique = true),
 })
-@EntityListeners(AuditingEntityListener.class)
 @Generated // To disable counting in unit test coverage
-public class UserAccountEntity
+public class UserAccountEntity extends BaseAuditedEntity<UUID>
 {
     public static final String TABLE_NAME = "user_account";
 
@@ -61,10 +51,6 @@ public class UserAccountEntity
     public static final String COL_EMAIL = "email";
     public static final String COL_GENDER = "gender";
     public static final String COL_BIRTHDATE = "birthdate";
-    public static final String COL_CREATED_AT = "created_at";
-    public static final String COL_CREATED_BY = "created_by";
-    public static final String COL_UPDATED_AT = "updated_at";
-    public static final String COL_UPDATED_BY = "updated_by";
 
     @Id
     @GeneratedValue
@@ -99,24 +85,6 @@ public class UserAccountEntity
     @Column(name = COL_EMAIL, nullable = false)
     private String email;
 
-    @CreatedBy
-    @Size(max = 150)
-    @Column(name = COL_CREATED_BY, nullable = false)
-    private String createdBy;
-
-    @CreatedDate
-    @Column(name = COL_CREATED_AT, nullable = false)
-    private Instant createdAt;
-
-    @LastModifiedBy
-    @Size(max = 150)
-    @Column(name = COL_UPDATED_BY)
-    private String updatedBy;
-
-    @LastModifiedDate
-    @Column(name = COL_UPDATED_AT)
-    private Instant updatedAt;
-
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = UserAccountXRoleEntity.TABLE_NAME,
@@ -127,18 +95,6 @@ public class UserAccountEntity
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     private Set<RoleEntity> roles = new HashSet<>();
-
-
-    public OffsetDateTime getCreatedAt()
-    {
-        return createdAt == null ? null : OffsetDateTime.ofInstant(createdAt, ZoneId.systemDefault());
-    }
-
-
-    public OffsetDateTime getUpdatedAt()
-    {
-        return updatedAt == null ? null : OffsetDateTime.ofInstant(updatedAt, ZoneId.systemDefault());
-    }
 
 
     public Set<Role> getRoles()

@@ -5,7 +5,6 @@ import hu.perit.classmate.db.classmate.converter.RegistrationStatusConverter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -18,7 +17,6 @@ import lombok.Generated;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -29,9 +27,8 @@ import java.util.UUID;
 @Table(name = RegistrationEntity.TABLE_NAME, schema = hu.perit.classmate.config.Constants.SCHEMA, indexes = {
         @Index(name = RegistrationEntity.IX_01, columnList = RegistrationEntity.COL_COURSE_ID + "," + RegistrationEntity.COL_USER_ID, unique = true)
 })
-@EntityListeners(AuditingEntityListener.class)
 @Generated // To disable counting in unit test coverage
-public class RegistrationEntity
+public class RegistrationEntity extends BaseEntity<UUID>
 {
     public static final String TABLE_NAME = "registration";
 
@@ -51,13 +48,21 @@ public class RegistrationEntity
     private UUID id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = COL_COURSE_ID, nullable = false)
+    @Column(name = COL_COURSE_ID, nullable = false)
+    private UUID courseId;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = COL_COURSE_ID, insertable = false, updatable = false)
     private CourseEntity course;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = COL_USER_ID, nullable = false)
+    @Column(name = COL_USER_ID, nullable = false)
+    private UUID userId;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = COL_USER_ID, insertable = false, updatable = false)
     private UserAccountEntity user;
 
     @NotNull
@@ -66,7 +71,7 @@ public class RegistrationEntity
     private RegistrationStatus status;
 
     @Column(name = COL_WAITLIST_POSITION)
-    private Integer waitlistPosition;
+    private Long waitlistPosition;
 
     @CreatedDate
     @Column(name = COL_REGISTERED_AT, nullable = false)

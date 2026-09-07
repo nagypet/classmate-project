@@ -50,7 +50,7 @@ public class UserAccountXRoleEntity
     @Id
     @NotNull
     @Column(name = COL_ROLE_ID, nullable = false)
-    private UUID roleId;
+    private Long roleId;
 
     @Setter(AccessLevel.NONE)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -64,6 +64,6 @@ public class UserAccountXRoleEntity
     public static class Pk implements Serializable
     {
         private UUID userId;
-        private UUID roleId;
+        private Long roleId;
     }
 }

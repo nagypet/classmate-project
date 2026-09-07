@@ -31,12 +31,17 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: waitlist_position
-                  type: int
+                  type: bigint
               - column:
                   name: registered_at
                   type: timestamp
                   constraints:
                     nullable: false
+              - column:
+                  constraints:
+                    nullable: false
+                  name: rec_version
+                  type: BIGINT
         - createIndex:
             schemaName: cmsa
             tableName: registration

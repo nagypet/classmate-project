@@ -30,9 +30,16 @@ databaseChangeLog:
               - column:
                   name: scheduled_at
                   type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: duration
+                  type: bigint
+                  constraints:
+                    nullable: false
               - column:
                   name: capacity
-                  type: int
+                  type: bigint
                   constraints:
                     nullable: false
               - column:
@@ -51,6 +58,11 @@ databaseChangeLog:
               - column:
                   name: updated_at
                   type: timestamp
+              - column:
+                  constraints:
+                    nullable: false
+                  name: rec_version
+                  type: BIGINT
         - addForeignKeyConstraint:
             baseTableSchemaName: cmsa
             baseTableName: course
